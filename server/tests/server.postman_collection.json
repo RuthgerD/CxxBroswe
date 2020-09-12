@@ -9,6 +9,47 @@
 			"name": "Users",
 			"item": [
 				{
+					"name": "Delete all Users",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b5212ff1-7a62-4a53-88b7-8e1ce34ff6af",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "111a7811-6b6a-4658-bf34-424dadab34ee",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/users",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Fail Create User",
 					"event": [
 						{
@@ -57,6 +98,7 @@
 							"script": {
 								"id": "bd4d2745-677a-4f71-b298-a6a19c2d184a",
 								"exec": [
+									"pm.environment.set(\"user_name\", `ItJustWorks+${pm.variables.replaceIn('{{$randomBsBuzz}}')}`)",
 									""
 								],
 								"type": "text/javascript"
@@ -69,7 +111,7 @@
 								"exec": [
 									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
 									"",
-									"pm.test(\"Post script\", () => pm.globals.set(\"user_id\", pm.response.json()));"
+									"pm.environment.set(\"user_id\", pm.response.json())"
 								],
 								"type": "text/javascript"
 							}
@@ -86,7 +128,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"ItJustWorks+{{random_name}}\"\n}",
+							"raw": "{\n    \"name\": \"{{user_name}}\"\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -116,7 +158,7 @@
 								"exec": [
 									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
 									"",
-									"pm.test(\"Correct body\", () => pm.response.to.have.jsonSchema({",
+									"pm.test(\"Correct body format\", () => pm.response.to.have.jsonSchema({",
 									"    \"type\": \"object\",",
 									"    \"properties\": {",
 									"        \"name\": { \"type\": \"string\" },",
@@ -125,7 +167,12 @@
 									"        \"proposals\": { \"type\": \"array\" }",
 									"    },",
 									"    \"required\": [\"name\"]",
-									"}))"
+									"}))",
+									"",
+									"pm.test(\"Correct body data\", () => {",
+									"    let json = pm.response.json();",
+									"    pm.expect(json.name).to.eql(pm.variables.get(\"user_name\"))",
+									"})"
 								],
 								"type": "text/javascript"
 							}
@@ -180,6 +227,37 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Fail retrieve User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "56079da2-f622-4f4a-b369-3e39dce40cae",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(404))"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -202,7 +280,7 @@
 					"script": {
 						"id": "d1fc3d92-3362-410e-8dfa-146aec1617e8",
 						"exec": [
-							"pm.test(\"Correct status code\", () => pm.response.to.have.status(200))"
+							"pm.test(\"Status\", () => pm.response.to.have.status(200))"
 						],
 						"type": "text/javascript"
 					}
