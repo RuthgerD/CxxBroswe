@@ -4,9 +4,7 @@ const ObjectId = mongoose.Types.ObjectId;
 module.exports = exports = (app, Model, path) => {
     app.use(`${path}/:id`, async (req, res) => {
         try {
-            if(!ObjectId.isValid(req.params.id)
-                && !(req.method === 'POST'
-                    && req.params.id === 'auto'))
+            if(!ObjectId.isValid(req.params.id))
                 return res.status(400).json({message: 'Invalid ID'});
             switch(req.method) {
                 case 'GET': {
