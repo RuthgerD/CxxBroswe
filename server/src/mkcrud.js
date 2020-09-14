@@ -48,7 +48,13 @@ module.exports = exports = (app, Model, path) => {
                     return res.status(200).send(obj._id);
                 } break;
                 case 'GET': {
-                    const objs = await Model.find({}, '_id').exec();
+                    let options = {
+                        limit: req.query.limit || 16,
+                        skip: req.query.skip || 0
+                    };
+                    if(req.query.sort)
+                        options.sort = req.query.sort;
+                    const objs = await Model.find({}, options, '_id').exec();
                     return res.status(200).json(objs);
                 } break;
                 case 'DELETE': {
