@@ -59,11 +59,36 @@ app.get('/api/id', async (req, res) => {
     res.json(mongoose.Types.ObjectId());
 });
 
+app.get('/api/users/:uid/proposals', async (req, res) => {
+    const obj = (await Proposal.find({author: req.params.uid}, 'proposals').exec());
+    return res.status(200).json(obj);
+});
+
+app.use('/api/users/:uid/proposals/:pid', async (req, res) => {
+    try {
+        switch(req.method) {
+            case 'GET': {
+                const obj = (await Proposal.find({_id: req.params.pid, author: req.params.uid}, 'proposals').exec());
+                return res.status(200).json(obj);
+            } break;
+            case 'DELETE': {
+                const obj = (await Proposal.findOneAndDelete({_id: req.params.pid, author: req.params.uid}, 'proposals').exec());
+                return res.status(200).json(req.params.pid);
+            } break;
+            default:
+                return res.status(405).json({message: 'Unsupported method'});
+        }
+    } catch(err) {
+        console.log('Error: ', err);
+        return res.status(400).send(err);
+    }
+});
 
 mkcrud(app, User, '/api/users');
 mkcrud(app, Diff, '/api/diffs');
 mkcrud(app, Proposal, '/api/proposals');
 mkcrud(app, Diff, '/api/standards');
+
 
 app.use('/api/*', (req, res) => {
     res.status(404).json({ 'message': 'Not Found' });
