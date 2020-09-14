@@ -18,7 +18,7 @@ module.exports = exports = (app, Model, path) => {
                     return res.status(200).json(obj);
                 } break;
                 case 'PUT': {
-                    let obj = await Model.findByIdAndUpdate(req.params.id, req.body);
+                    let obj = await Model.findByIdAndUpdate(req.params.id, req.body, {'new': true});
                     if (!obj)
                         return res.status(404).json({message: 'Object does not exist'});
                     if(obj.passhash !== undefined)
@@ -49,12 +49,12 @@ module.exports = exports = (app, Model, path) => {
                 } break;
                 case 'GET': {
                     let options = {
-                        limit: req.query.limit || 16,
-                        skip: req.query.skip || 0
+                        limit: parseInt(req.query.limit) || 16,
+                        skip: parseInt(req.query.skip) || 0
                     };
                     if(req.query.sort)
                         options.sort = req.query.sort;
-                    const objs = await Model.find({}, options, '_id').exec();
+                    const objs = await Model.find({}, '', options).exec();
                     return res.status(200).json(objs);
                 } break;
                 case 'DELETE': {
