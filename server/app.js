@@ -64,6 +64,16 @@ app.get('/api/users/:uid/proposals', async (req, res) => {
     return res.status(200).json(obj);
 });
 
+app.post('/api/users/:uid/proposals', async (req, res) => {
+    if(req.body._id !== undefined)
+        return res.status(400).json({message: 'POST requests may not set "_id"'});
+    req.body._id = ObjectId();
+    req.body.author = req.params.uid;
+    const obj = await new Proposal(req.body).save();
+    // TODO Update the user to add the proposal to its list
+    return res.status(200).send(obj._id);
+});
+
 app.use('/api/users/:uid/proposals/:pid', async (req, res) => {
     try {
         switch(req.method) {
