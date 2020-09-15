@@ -655,6 +655,96 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Pagination limit & skip",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "879fd55c-c3ea-4959-87f4-5f33159ae365",
+								"exec": [
+									"let amount = 4",
+									"pm.environment.set(\"paginate_test_amount\", amount)",
+									"",
+									"let create_req = (req_name) => {",
+									"    console.log(req_name)",
+									"    return {",
+									"        url: `${pm.variables.get(\"host\")}/api/diffs`,",
+									"        method: 'POST',",
+									"        header: {",
+									"            'Content-Type': 'application/json',",
+									"        },",
+									"        body: {",
+									"            mode: 'raw',",
+									"            raw: JSON.stringify({",
+									"                author: pm.variables.get(\"user_id\"),",
+									"                content: \"something\",",
+									"                name: req_name",
+									"            })",
+									"        }",
+									"    };",
+									"}",
+									"",
+									"for (let i = 0; i < amount * 2; ++i) {",
+									"    pm.sendRequest(create_req(amount * 2 - i), (err, response) => {",
+									"        // make sure all the requests were succesfull",
+									"        pm.expect(err).to.equal(null)",
+									"        pm.expect(response).to.have.property('code', 200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "4dcdbc45-9f66-471d-9e09-4e5c9f413298",
+								"exec": [
+									"const paginate_amount = pm.variables.get(\"paginate_test_amount\")",
+									"const json = pm.response.json()",
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Paginate limit\", () => {",
+									"    pm.expect(json.length).to.eql(paginate_amount)",
+									"});",
+									"",
+									"pm.sendRequest(`${pm.variables.get(\"host\")}/api/diffs?limit=${paginate_amount}&skip=${paginate_amount}`, (err, response) => {",
+									"    pm.test(\"Paginate skip\", () => {",
+									"        let skipped_json = response.json()",
+									"        pm.expect(skipped_json.length).to.eql(paginate_amount)",
+									"        skipped_json.forEach((doc) => json.forEach((doc2) => pm.expect(doc._id).to.not.eql(doc2._id)))",
+									"    })",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/diffs?limit={{paginate_test_amount}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"diffs"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "{{paginate_test_amount}}"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
