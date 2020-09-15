@@ -92,7 +92,15 @@ app.use('/api/users/:uid/proposals/:pid', async (req, res) => {
                 return res.status(200).json(obj);
             } break;
             case 'DELETE': {
-                const obj = (await Proposal.findOneAndDelete({_id: req.params.pid, author: req.params.uid}, 'proposals').exec());
+                let user = await User.findById(req.params.uid).exec();
+                if (!user)
+                    return res.status(404).json({message: 'Object does not exist'});
+
+                await Proposal.findOneAndDelete({_id: req.params.pid, author: req.params.uid}).exec();
+                
+                user.proposals = user.proposals.filter(el => el != req.params.pid)
+                user.save()
+
                 return res.status(200).json(req.params.pid);
             } break;
             default:
