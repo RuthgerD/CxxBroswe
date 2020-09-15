@@ -567,6 +567,94 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Retrieve User + Proposal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5df528ce-215c-44c4-9d32-9313d6aa2503",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Correct body data\", () => {",
+									"    let json = pm.response.json();",
+									"    pm.expect(json._id).to.eql(pm.variables.get(\"proposal_id\"))",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}/proposals/{{proposal_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}",
+								"proposals",
+								"{{proposal_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Direct add Proposal to User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2cd1c6a7-29e8-4646-aa3e-d4bc0522d94d",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Proposal was added to user\", () => {",
+									"    pm.sendRequest(`${pm.variables.get(\"host\")}/api/users/${pm.variables.get(\"user_id\")}`, (err, response) => {",
+									"        let json = pm.response.json()",
+									"        let user_json = response.json()",
+									"        pm.expect(user_json.proposals.includes(json)).to.eql(true)",
+									"    });",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"number\": \"P999\",\n    \"name\": \"Random Proposal2\",\n    \"versions\": [\"{{diff_id}}\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}/proposals",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}",
+								"proposals"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
