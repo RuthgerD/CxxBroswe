@@ -753,6 +753,47 @@
 			"name": "Delete post",
 			"item": [
 				{
+					"name": "Direct delete Proposal from User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2163a86f-c23c-4d7d-ac03-443bfc4bd5cd",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.sendRequest(`${pm.variables.get(\"host\")}/api/users/${pm.variables.get(\"user_id\")}`, (err, response) => {",
+									"    pm.test(\"Proposal was added to user\", () => {",
+									"    let json = pm.response.json()",
+									"    let user_json = response.json()",
+									"    pm.expect(user_json.proposals.includes(json)).to.eql(false)",
+									"    })",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}/proposals/{{proposal_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}",
+								"proposals",
+								"{{proposal_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Delete User",
 					"event": [
 						{
