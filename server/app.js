@@ -14,6 +14,8 @@ const Standard = require('./models/Standard.js');
 
 const mkcrud = require('./src/mkcrud.js')
 
+const ObjectId = mongoose.Types.ObjectId;
+
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/cxx-draft-browse';
 const port = process.env.PORT || 3000;
 
@@ -56,7 +58,7 @@ app.get('/api/version', async (req, res) => {
 });
 
 app.get('/api/id', async (req, res) => {
-    res.json(mongoose.Types.ObjectId());
+    res.json(ObjectId());
 });
 
 app.get('/api/users/:uid/proposals', async (req, res) => {
@@ -65,12 +67,20 @@ app.get('/api/users/:uid/proposals', async (req, res) => {
 });
 
 app.post('/api/users/:uid/proposals', async (req, res) => {
+    let user = await User.findById(req.params.uid).exec();
+    if (!user)
+        return res.status(404).json({message: 'Object does not exist'});
+    
     if(req.body._id !== undefined)
         return res.status(400).json({message: 'POST requests may not set "_id"'});
+    
     req.body._id = ObjectId();
     req.body.author = req.params.uid;
     const obj = await new Proposal(req.body).save();
-    // TODO Update the user to add the proposal to its list
+    
+    user.proposals.push(obj._id)
+    await user.save()
+    
     return res.status(200).send(obj._id);
 });
 
@@ -78,7 +88,7 @@ app.use('/api/users/:uid/proposals/:pid', async (req, res) => {
     try {
         switch(req.method) {
             case 'GET': {
-                const obj = (await Proposal.find({_id: req.params.pid, author: req.params.uid}, 'proposals').exec());
+                const obj = (await Proposal.find({_id: req.params.pid, author: req.params.uid}, 'proposals').exec())[0];
                 return res.status(200).json(obj);
             } break;
             case 'DELETE': {
