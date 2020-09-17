@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const path = require('path');
 const cors = require('cors');
 const history = require('connect-history-api-fallback');
+const bcrypt = require('bcrypt');
 //const OAuthServer = require('express-oauth-server');
 
 const User = require('./models/User.js');
@@ -61,6 +62,23 @@ app.get('/api/id', async (req, res) => {
     res.json(ObjectId());
 });
 
+app.patch('/api/users/:uid/change_password', async (req, res) => {
+    let user = await User.findById(req.params.uid).exec();
+    user.passhash = bcrypt.hash(req.body, 16);
+    await user.save();
+    return res.status(200).json({message: "Success"});
+});
+
+app.patch('/api/proposals/:pid/add_version/:vid', async (req, res) => {
+    let proposal = await Proposal.findById(req.params.pid).exec();
+    if(!ObjectId.isValid(req.params.vid))
+        return res.status(400).json({message: 'Invalid ID'});
+    proposal.versions = proposal.versions || [];
+    proposal.versions.push(req.body);
+    await proposal.save();
+    return res.status(200).json({message: "Success"});
+});
+
 app.get('/api/users/:uid/proposals', async (req, res) => {
     const obj = (await Proposal.find({author: req.params.uid}, 'proposals').exec());
     return res.status(200).json(obj);
@@ -78,8 +96,8 @@ app.post('/api/users/:uid/proposals', async (req, res) => {
     req.body.author = req.params.uid;
     const obj = await new Proposal(req.body).save();
     
-    user.proposals.push(obj._id)
-    await user.save()
+    user.proposals.push(obj._id);
+    await user.save();
     
     return res.status(200).send(obj._id);
 });
