@@ -64,7 +64,7 @@ app.get('/api/id', async (req, res) => {
 
 app.patch('/api/users/:uid/change_password', async (req, res) => {
     let user = await User.findById(req.params.uid).exec();
-    user.passhash = bcrypt.hash(req.body, 16);
+    user.passhash = await bcrypt.hash(req.body.password.toString(), 10);
     await user.save();
     return res.status(200).json({message: "Success"});
 });

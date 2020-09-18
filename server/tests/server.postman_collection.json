@@ -254,6 +254,48 @@
 					"response": []
 				},
 				{
+					"name": "Change password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8b5d3ceb-4d0c-4db4-84a4-527694e0e77f",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\"ilikeducks\"\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}/change_password",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}",
+								"change_password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Retrieve User",
 					"event": [
 						{
