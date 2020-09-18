@@ -1,19 +1,1032 @@
 {
 	"info": {
-		"_postman_id": "f7ee95b5-9cb9-442f-a6a9-42de46138872",
+		"_postman_id": "1e6f2daf-ffc8-4544-93a7-777915653d67",
 		"name": "server",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
+		{
+			"name": "Delete pre",
+			"item": [
+				{
+					"name": "Delete all Users",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b5212ff1-7a62-4a53-88b7-8e1ce34ff6af",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "111a7811-6b6a-4658-bf34-424dadab34ee",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/users",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete all Diffs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4a03698e-fdfe-41bb-97ae-13a158586d9b",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/diffs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"diffs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete all Proposals",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f89cda3b-1446-4bdb-8113-51544f720ab3",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/proposals",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"proposals"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Failure pre",
+			"item": [
+				{
+					"name": "Fail Create User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "21fcb682-3e80-4800-9477-ab389d829bb5",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(400))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"wack\": 123\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/users",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid ID User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "88c6fe2a-cda6-4c2d-9fd4-6daa0baed854",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(400))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/users/Q",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"Q"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Main",
+			"item": [
+				{
+					"name": "Create User",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "bd4d2745-677a-4f71-b298-a6a19c2d184a",
+								"exec": [
+									"pm.environment.set(\"user_name\", `ItJustWorks+${pm.variables.replaceIn('{{$randomBsBuzz}}')}`)",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "b22e6f01-0787-494a-9607-1bf20626277b",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.environment.set(\"user_id\", pm.response.json())"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "random_name",
+								"value": "{{$randomAdjective}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{user_name}}\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/users",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8b5d3ceb-4d0c-4db4-84a4-527694e0e77f",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"ilikeducks\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}/change_password",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}",
+								"change_password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b29b11bc-886b-405d-8769-ad55214394c4",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Correct body format\", () => pm.response.to.have.jsonSchema({",
+									"    \"type\": \"object\",",
+									"    \"properties\": {",
+									"        \"name\": { \"type\": \"string\" },",
+									"        \"passhash\": { \"type\": \"string\" },",
+									"        \"diffs\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } },",
+									"        \"proposals\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } }",
+									"    },",
+									"    \"required\": [\"name\"]",
+									"}))",
+									"",
+									"pm.test(\"Correct body data\", () => {",
+									"    let json = pm.response.json();",
+									"    pm.expect(json.name).to.eql(pm.variables.get(\"user_name\"))",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Diff",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c9338c24-e07f-43cf-8e9f-f276224f0b23",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.environment.set(\"diff_id\", pm.response.json())"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"author\": \"{{user_id}}\",\n    \"content\": \"something\",\n    \"name\": \"dummy diff\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/diffs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"diffs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Diff",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "19235156-bfdc-4625-96c8-82e890e0dabb",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Correct body format\", () => pm.response.to.have.jsonSchema({",
+									"    \"type\": \"object\",",
+									"    \"properties\": {",
+									"        \"author\": { \"type\": \"string\" },",
+									"        \"content\": { \"type\": \"string\" },",
+									"        \"name\": { \"type\": \"string\" }",
+									"    },",
+									"    \"required\": [\"content\"]",
+									"}))",
+									"",
+									"// pm.test(\"Correct body data\", () => {",
+									"//     let json = pm.response.json();",
+									"//     pm.expect(json.name).to.eql(pm.variables.get(\"user_name\"))",
+									"// })"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/diffs/{{diff_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"diffs",
+								"{{diff_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Diff to User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "75dc7e42-fc09-4c57-b129-69680a2e5139",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Correct body data\", () => {",
+									"    let json = pm.response.json();",
+									"    pm.expect(json.name).to.eql(pm.variables.get(\"user_name\"))",
+									"    pm.expect(json.diffs).to.eql([pm.variables.get(\"diff_id\")])",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{user_name}}\",\n    \"diffs\": [\"{{diff_id}}\"],\n    \"proposals\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Proposal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c6ddce75-dd8a-4c21-876e-0b4980ecdd1c",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.environment.set(\"proposal_id\", pm.response.json())"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"number\": \"P0000\",\n    \"name\": \"Random Proposal\",\n    \"author\": \"{{user_id}}\",\n    \"versions\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/proposals",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"proposals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add proposal version",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a532e5c8-3ab3-4b90-908c-73d7fc46e9c0",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/proposals/{{proposal_id}}/add_version/{{diff_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"proposals",
+								"{{proposal_id}}",
+								"add_version",
+								"{{diff_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Proposal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "668aa7bf-2859-4703-9eac-3b0a0726d79c",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Correct body format\", () => pm.response.to.have.jsonSchema({",
+									"    \"type\": \"object\",",
+									"    \"properties\": {",
+									"        \"number\": { \"type\": \"string\" },",
+									"        \"name\": { \"type\": \"string\" },",
+									"        \"author\": { \"type\": \"string\" },",
+									"        \"versions\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } }",
+									"    },",
+									"    \"required\": [\"number\", \"name\", \"author\", \"versions\"]",
+									"}))",
+									"",
+									"// pm.test(\"Correct body data\", () => {",
+									"//     let json = pm.response.json();",
+									"//     pm.expect(json.name).to.eql(pm.variables.get(\"user_name\"))",
+									"// })"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/proposals/{{proposal_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"proposals",
+								"{{proposal_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Proposal to User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "707993d6-cc42-4c0d-b0d1-9205d96a48fb",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Correct body data\", () => {",
+									"    let json = pm.response.json();",
+									"    pm.expect(json.name).to.eql(pm.variables.get(\"user_name\"))",
+									"    pm.expect(json.diffs).to.eql([pm.variables.get(\"diff_id\")])",
+									"    pm.expect(json.proposals).to.eql([pm.variables.get(\"proposal_id\")])",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{user_name}}\",\n    \"diffs\": [\"{{diff_id}}\"],\n    \"proposals\": [\"{{proposal_id}}\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve User + Proposal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5df528ce-215c-44c4-9d32-9313d6aa2503",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Correct body data\", () => {",
+									"    let json = pm.response.json();",
+									"    pm.expect(json._id).to.eql(pm.variables.get(\"proposal_id\"))",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}/proposals/{{proposal_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}",
+								"proposals",
+								"{{proposal_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Direct add Proposal to User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2cd1c6a7-29e8-4646-aa3e-d4bc0522d94d",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Proposal was added to user\", () => {",
+									"    pm.sendRequest(`${pm.variables.get(\"host\")}/api/users/${pm.variables.get(\"user_id\")}`, (err, response) => {",
+									"        let json = pm.response.json()",
+									"        let user_json = response.json()",
+									"        pm.expect(user_json.proposals.includes(json)).to.eql(true)",
+									"    });",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"number\": \"P999\",\n    \"name\": \"Random Proposal2\",\n    \"versions\": [\"{{diff_id}}\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}/proposals",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}",
+								"proposals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pagination limit & skip",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "879fd55c-c3ea-4959-87f4-5f33159ae365",
+								"exec": [
+									"let amount = 4",
+									"pm.environment.set(\"paginate_test_amount\", amount)",
+									"",
+									"let create_req = (req_name) => {",
+									"    console.log(req_name)",
+									"    return {",
+									"        url: `${pm.variables.get(\"host\")}/api/diffs`,",
+									"        method: 'POST',",
+									"        header: {",
+									"            'Content-Type': 'application/json',",
+									"        },",
+									"        body: {",
+									"            mode: 'raw',",
+									"            raw: JSON.stringify({",
+									"                author: pm.variables.get(\"user_id\"),",
+									"                content: \"something\",",
+									"                name: req_name",
+									"            })",
+									"        }",
+									"    };",
+									"}",
+									"",
+									"for (let i = 0; i < amount * 2; ++i) {",
+									"    pm.sendRequest(create_req(amount * 2 - i), (err, response) => {",
+									"        // make sure all the requests were succesfull",
+									"        pm.expect(err).to.equal(null)",
+									"        pm.expect(response).to.have.property('code', 200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "4dcdbc45-9f66-471d-9e09-4e5c9f413298",
+								"exec": [
+									"const paginate_amount = pm.variables.get(\"paginate_test_amount\")",
+									"const json = pm.response.json()",
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Paginate limit\", () => {",
+									"    pm.expect(json.length).to.eql(paginate_amount)",
+									"});",
+									"",
+									"pm.sendRequest(`${pm.variables.get(\"host\")}/api/diffs?limit=${paginate_amount}&skip=${paginate_amount}`, (err, response) => {",
+									"    pm.test(\"Paginate skip\", () => {",
+									"        let skipped_json = response.json()",
+									"        pm.expect(skipped_json.length).to.eql(paginate_amount)",
+									"        skipped_json.forEach((doc) => json.forEach((doc2) => pm.expect(doc._id).to.not.eql(doc2._id)))",
+									"    })",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/diffs?limit={{paginate_test_amount}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"diffs"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "{{paginate_test_amount}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Delete post",
+			"item": [
+				{
+					"name": "Direct delete Proposal from User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2163a86f-c23c-4d7d-ac03-443bfc4bd5cd",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.sendRequest(`${pm.variables.get(\"host\")}/api/users/${pm.variables.get(\"user_id\")}`, (err, response) => {",
+									"    pm.test(\"Proposal was added to user\", () => {",
+									"    let json = pm.response.json()",
+									"    let user_json = response.json()",
+									"    pm.expect(user_json.proposals.includes(json)).to.eql(false)",
+									"    })",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}/proposals/{{proposal_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}",
+								"proposals",
+								"{{proposal_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dddf1c99-8301-46ad-8625-ae95453a336a",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Correct deleted\", () => pm.response.toJSON() == pm.globals.get(\"user_id\"))"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Proposal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "86e76c27-a468-4b55-8685-bbdc2c81f877",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Correct deleted\", () => pm.response.toJSON() == pm.globals.get(\"proposal_id\"))"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/proposals/{{proposal_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"proposals",
+								"{{proposal_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Diff",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "800068ba-c339-4de4-93ea-414ec4a541a8",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"",
+									"pm.test(\"Correct deleted\", () => pm.response.toJSON() == pm.globals.get(\"diff_id\"))"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/diffs/{{diff_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"diffs",
+								"{{diff_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Failure post",
+			"item": [
+				{
+					"name": "Fail retrieve User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "56079da2-f622-4f4a-b369-3e39dce40cae",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(404))"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/users/{{user_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
 		{
 			"name": "GET /api",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "b58d92ec-5214-450c-adb0-28e068aa71b9",
+						"id": "45f9be75-bade-40d4-a346-8c02dba44360",
 						"exec": [
 							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "d1fc3d92-3362-410e-8dfa-146aec1617e8",
+						"exec": [
+							"pm.test(\"Status\", () => pm.response.to.have.status(200))"
 						],
 						"type": "text/javascript"
 					}
@@ -45,7 +1058,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "05864cff-5cba-4070-bac3-a59328954ebf",
+				"id": "b7f1664d-e711-4bdc-9228-d70b81b3d3f5",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -55,7 +1068,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "e9c319be-3306-4fc5-ba34-fcf64391213a",
+				"id": "07c98873-4e87-4018-ad1b-eecefa47d063",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -65,10 +1078,9 @@
 	],
 	"variable": [
 		{
-			"id": "cd185905-a834-4211-8030-583d17702534",
+			"id": "e042b425-088a-4a01-84a3-cb27854e91e2",
 			"key": "host",
-			"value": "http://localhost:3000",
-			"type": "string"
+			"value": "http://localhost:3000"
 		}
 	],
 	"protocolProfileBehavior": {}
