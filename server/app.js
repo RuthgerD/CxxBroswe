@@ -64,6 +64,8 @@ app.get('/api/id', async (req, res) => {
 
 app.patch('/api/users/:uid/change_password', async (req, res) => {
     let user = await User.findById(req.params.uid).exec();
+    if (!user)
+        return res.status(404).json({message: 'Object does not exist'});
     user.passhash = await bcrypt.hash(req.body.password.toString(), 10);
     await user.save();
     return res.status(200).json({message: "Success"});
@@ -71,10 +73,12 @@ app.patch('/api/users/:uid/change_password', async (req, res) => {
 
 app.patch('/api/proposals/:pid/add_version/:vid', async (req, res) => {
     let proposal = await Proposal.findById(req.params.pid).exec();
+    if (!proposal)
+        return res.status(404).json({message: 'Object does not exist'});
     if(!ObjectId.isValid(req.params.vid))
         return res.status(400).json({message: 'Invalid ID'});
     proposal.versions = proposal.versions || [];
-    proposal.versions.push(req.body);
+    proposal.versions.push(req.params.vid);
     await proposal.save();
     return res.status(200).json({message: "Success"});
 });

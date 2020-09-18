@@ -273,7 +273,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "\"ilikeducks\"\n",
+							"raw": "{\n    \"password\": \"ilikeducks\"\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -496,7 +496,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"number\": \"P0000\",\n    \"name\": \"Random Proposal\",\n    \"author\": \"{{user_id}}\",\n    \"versions\": [\"{{diff_id}}\"]\n}",
+							"raw": "{\n    \"number\": \"P0000\",\n    \"name\": \"Random Proposal\",\n    \"author\": \"{{user_id}}\",\n    \"versions\": []\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -511,6 +511,40 @@
 							"path": [
 								"api",
 								"proposals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add proposal version",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a532e5c8-3ab3-4b90-908c-73d7fc46e9c0",
+								"exec": [
+									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/proposals/{{proposal_id}}/add_version/{{diff_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"proposals",
+								"{{proposal_id}}",
+								"add_version",
+								"{{diff_id}}"
 							]
 						}
 					},
