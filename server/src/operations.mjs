@@ -87,7 +87,7 @@ agenda.define('gen-cdhg', async job => {
 });
 
 const path_for = (base, diffs) => {
-    return `.managed/cache/${base}+${diffs.map(s => (s + ',')).reduce((a, b) => (a + b))}`
+    return `.managed/cache/${base}${diffs.length > 0 ? '+' + diffs.map(s => (s + ',')).reduce((a, b) => (a + b)) : ''}`
 };
 
 const gen_dynamic = async (base, diffs) => {
