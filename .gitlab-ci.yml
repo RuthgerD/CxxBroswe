@@ -1,11 +1,15 @@
-image: node:10-alpine
+image: node:14-alpine
 
 # Cache modules in between jobs per-branch
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
     - server/node_modules/
-
+    - server/.managed/cache/
+    - server/.managed/draft/
+    - server/.managed/cxxdraft-htmlgen/
+    - server/stack
+    - /root/.stack
 stages:
   - build
   - test
@@ -16,8 +20,13 @@ build:
   tags:
     - docker
   script:
+    - apk add -q ghc python tzdata pkgconfig build-base libgit2-dev krb5-dev pcre curl
+    - ghc --version
+    - ln -s /usr/lib/libcurl.so.4 /usr/lib/libcurl-gnutls.so.4
+    - ln -s /usr/lib/libncursesw.so.6 /usr/lib/libtinfo.so.6
     - cd server
-    - npm install
+    - test -d node_modules/nodegit || BUILD_ONLY=true npm install -s nodegit
+    - npm install --unsafe-perm
 
 test:
   stage: test
@@ -29,7 +38,12 @@ test:
   variables:
     MONGODB_URI: "mongodb://mongo:27017/serverTestDB"
   script:
+    - apk --no-cache -q add git make ghc libgit2-dev krb5 pcre graphviz python tzdata pkgconfig build-base libgit2-dev krb5-dev curl
+    - ln -s /usr/lib/libcurl.so.4 /usr/lib/libcurl-gnutls.so.4
+    - ln -s /usr/lib/libncursesw.so.6 /usr/lib/libtinfo.so.6
     - cd server
+    - ./stack config set system-ghc --global true
+    - npm run postinstall
     - npm run ci-test
 
 deploy:
