@@ -8,29 +8,36 @@
   "description": "Template for ExpressJS API with Mongoose for Web and Mobile Engineering (DIT341)",
   "main": "./app.js",
   "scripts": {
-    "start": "node ./app.js",
-    "dev": "nodemon ./app.js",
+    "start": "node ./app.mjs",
+    "dev": "nodemon ./app.mjs",
     "lint": "eslint .",
     "test": "cross-env-shell MONGODB_URI=mongodb://localhost:27017/serverTestDB \"npm run newman-server\"",
     "ci-test": "npm run newman-server",
     "newman-server": "cross-env-shell PORT=3001 \"npm run dropdb && run-p --race start newman-wait\"",
     "newman-wait": "wait-on http://localhost:3001/api && npm run newman",
     "newman": "newman run ./tests/server.postman_collection.json --env-var host=http://localhost:3001",
-    "dropdb": "node ./tests/dropdb.js"
+    "dropdb": "node ./tests/dropdb.js",
+    "postinstall": "cross-env-shell node ./setup.mjs"
   },
   "repository": {
     "type": "git",
     "url": "git+https://gitlab.com/dit341/group-11-web.git"
   },
   "dependencies": {
+    "agenda": "^3.1.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
+    "child_process": "^1.0.2",
     "connect-history-api-fallback": "^1.6.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-oauth-server": "^2.0.0",
+    "mathjax-node-cli": "^1.0.1",
     "mongoose": "^5.10.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "nodegit": "^0.27.0",
+    "split": "^1.0.1",
+    "touch": "^3.1.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.2",

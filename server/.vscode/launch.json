@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Debug Server",
-            "program": "${workspaceFolder}/app.js"
+            "program": "${workspaceFolder}/app.mjs"
         }
     ]
 }
