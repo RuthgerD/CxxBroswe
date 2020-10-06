@@ -5,7 +5,7 @@
         <b-col v-html="page_html"/>
       </b-container>
     </div>
-    <div v-show="seen" class="cxx-container">
+    <div v-if="seen" class="cxx-container">
       <h1 class="text-center">Cxx-broswe™</h1>
       <splitdiv />
       <div style="flex: 1 1 auto">
@@ -76,13 +76,14 @@
 import Splitdiv from './Splitdiv.vue'
 import RightJust from './RightJust.vue'
 import AccountPreview from './AccountPreview.vue'
+import { store /*, mutations */ } from '@/store.js'
 
 export default {
   name: 'Container',
   data() {
     this.get_base()
     return {
-      seen: true,
+      seen: false,
       page_html: '',
       fetching: false,
       base_commit: null,
@@ -126,6 +127,11 @@ export default {
       }).finally(() => {
         this.fetching = false
       })
+    }
+  },
+  computed: {
+    isPanelOpen() {
+      return store.state.isNavOpen
     }
   },
 

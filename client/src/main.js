@@ -8,6 +8,7 @@ import VueAxios from 'vue-axios'
 import './style.scss'
 
 Vue.use(VueAxios, axios)
+
 Vue.use(BootstrapVue)
 
 Vue.config.productionTip = false
