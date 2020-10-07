@@ -281,7 +281,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}/api/users/{{user_id}}/change_password",
+							"raw": "{{host}}/api/users/{{user_id}}/password",
 							"host": [
 								"{{host}}"
 							],
@@ -289,7 +289,7 @@
 								"api",
 								"users",
 								"{{user_id}}",
-								"change_password"
+								"password"
 							]
 						}
 					},
