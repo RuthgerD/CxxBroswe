@@ -1,31 +1,19 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Container from './components/Container.vue'
-import Login from './components/auth/Login'
-import Logout from './components/auth/Logout'
+import Main from './views/Main.vue'
 
 Vue.use(Router)
 
 const routes = [
   {
     path: '/',
-    name: 'container',
-    component: Container
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: Login
-  },
-  {
-    path: '/logout',
-    name: 'logout',
-    component: Logout
+    name: 'main',
+    component: Main
   },
   {
     path: '/:page',
-    name: 'container with page',
-    component: Container
+    name: 'main with page',
+    component: Main
   }
 ]
 

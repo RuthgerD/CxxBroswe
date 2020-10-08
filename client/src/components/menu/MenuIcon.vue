@@ -1,6 +1,6 @@
 <template>
-  <div id="burger" :class="{ 'active' : isMenuOpen }" @click.prevent="toggle">
-    <button type="button" class="btn btn-light outline-primary burger-button m-lg-5 m-md-3" :class="{'burger-button-close m-0': isMenuOpen, 'm-5': !isMenuOpen}" title="Menu">
+  <div id="burger" :class="{ 'active' : isNavOpen }" @click.prevent="$store.commit('toggleNav')">
+    <button type="button" class="btn btn-light outline-primary burger-button" :class="{'burger-button-close': isNavOpen}" title="Menu">
       <span class="burger-bar burger-bar--1"></span>
       <span class="burger-bar burger-bar--2"></span>
       <span class="burger-bar burger-bar--3"></span>
@@ -8,18 +8,12 @@
   </div>
 </template>
 <script>
-import { store, mutations } from '@/store.js'
+import { mapState } from 'vuex'
 
 export default {
+  name: 'MenuIcon',
   computed: {
-    isMenuOpen() {
-      return store.state.isNavOpen
-    }
-  },
-  methods: {
-    toggle() {
-      mutations.toggleNav()
-    }
+    ...mapState(['isNavOpen'])
   }
 }
 </script>
@@ -32,21 +26,25 @@ export default {
   transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
- @media only screen and (min-width: 992px) {
+ @media only screen and (min-width: 992px), screen and (max-height: 600px) {
   .burger-button {
-    top: 0;
-    left: 0;
+    top: 10px;
+    left: 10px;
+  }
+  .burger-button-close {
+    top: 10px;
+    left: 10px;
   }
  }
 
  @media only screen and (max-width: 991px) {
-  .burger-button-close {
-    top: 0 !important;
-    left: 0 !important;
-  }
   .burger-button {
-    bottom: 0;
-    right: 0;
+    bottom: 10px;
+    right: 10px;
+  }
+  .burger-button-close {
+    top: 10px;
+    left: 10px;
   }
  }
 

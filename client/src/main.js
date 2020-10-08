@@ -3,11 +3,8 @@ import App from './App.vue'
 import router from './router'
 import BootstrapVue from 'bootstrap-vue'
 
-import axios from 'axios'
-import VueAxios from 'vue-axios'
 import './style.scss'
-
-Vue.use(VueAxios, axios)
+import { store } from '@/store.js'
 
 Vue.use(BootstrapVue)
 
@@ -15,5 +12,9 @@ Vue.config.productionTip = false
 
 new Vue({
   router,
-  render: function (h) { return h(App) }
+  store,
+  created() {
+    this.$store.dispatch('checkLoggedIn')
+  },
+  render: r => r(App)
 }).$mount('#app')

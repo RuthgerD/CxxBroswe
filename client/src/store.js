@@ -1,49 +1,65 @@
 import Vue from 'vue'
 import { Api } from '@/Api'
+import VueAuthenticate from 'vue-authenticate'
+import axios from 'axios'
 
-// save our state (isPanel open or not)
-export const store = Vue.observable({
-  state: {
-    isNavOpen: !(window.matchMedia('(max-width: 1199px)').matches), // false,
-    token: localStorage.getItem('auth_token') || null,
-    hasValidToken: false
-  },
-  getters: {
+import Vuex from 'vuex'
 
-  },
-  actions: {
-
+const auth = VueAuthenticate.factory(axios, {
+  baseUrl: 'http://localhost:3000', // API domain
+  providers: {
+    github: {
+      clientId: 'c2ff54cacaccb53954dd',
+      redirectUri: 'http://localhost:8080/auth/callback' // Client app URL
+    }
   }
 })
 
-// We call mutations anywhere we need it in our app
-export const mutations = {
-  toggleNav() {
-    store.state.isNavOpen = !store.state.isNavOpen
+Vue.use(Vuex)
+
+export const store = new Vuex.Store({
+  state: {
+    isNavOpen: true,
+    token: localStorage.getItem('auth_token') || null,
+    hasValidToken: false
   },
-  storeToken(token) {
-    store.state.token = token
-    this.setIsLoggedIn(true)
-    localStorage.setItem('auth_token', token)
+  mutations: {
+    setLoggedIn(state, logged) {
+      state.hasValidToken = logged
+    },
+    setToken(state, token) {
+      state.token = token
+      localStorage.setItem('auth_token', token)
+    },
+    destroyToken(state) {
+      state.token = null
+      localStorage.removeItem('auth_token')
+    },
+    toggleNav(state) {
+      state.isNavOpen = !state.isNavOpen
+    }
   },
-  setIsLoggedIn(val) {
-    store.state.hasValidToken = val
-  },
-  destroyToken() {
-    store.state.token = null
-    store.state.hasValidToken = false
-    localStorage.removeItem('auth_token')
-  },
-  async checkIsLoggedIn() {
-    try {
-      if (store.state.token) {
-        const result = await Api.post('../auth/verify_token', { token: store.state.token })
-        this.setIsLoggedIn(result.status === 200)
+  actions: {
+    checkLoggedIn(context) {
+      if (context.state.token) {
+        // TODO: delegate this to Api.js
+        Api.post('../auth/verify_token', { token: context.state.token })
+          .then(res => {
+            console.log('currently logged in')
+            context.commit('setLoggedIn', res.status === 200)
+          })
+          .catch(err => console.log(err))
       } else {
-        this.setIsLoggedIn(false)
+        context.commit('setLoggedIn', false)
       }
-    } catch (error) {
-      console.log('Login failed')
+    },
+    authenticateUser(context, provider) {
+      auth.authenticate(provider)
+        .then((res) => {
+          context.commit('setToken', res.data.access_token)
+          context.dispatch('checkLoggedIn')
+        })
+        .catch((err) => console.log(err))
     }
   }
-}
+})
