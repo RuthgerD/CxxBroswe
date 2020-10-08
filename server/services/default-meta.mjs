@@ -6,7 +6,10 @@ export default function(Model) {
     return class {
         static async create(content) {
             content._id = Types.ObjectId();
-            return await new Model(content).save();
+            const obj = new Model(content);
+            if(obj.validateSync())
+                return null;
+            return await obj.save();
         }
         static async list(cond, proj, population, options) {
             const query = Model.find(cond, proj, options);

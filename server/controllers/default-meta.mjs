@@ -4,15 +4,13 @@ const { ObjectId } = Types;
 
 export default function(Service){
     return class {
-        static async create(req, res, next) {
-            //try {
+        static async create(req, res) {
                 if (req.body._id !== undefined)
                     return res.status(400).json({message: 'POST requests may not set "_id"'});
                 const obj = await Service.create(req.body);
+                if(!obj)
+                    return res.status(400).json({message: 'Malformed object'});
                 return res.status(200).send(obj._id);
-            //} catch (e) {
-            //    next(e);
-            //}
         }
         static async list(req, res) {
             let options = {

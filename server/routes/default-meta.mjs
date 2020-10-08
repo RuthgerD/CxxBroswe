@@ -2,8 +2,7 @@ import express from 'express';
 
 export function check_method_allowed(router) {
     return async (req, res, next) => {
-        console.log(req.path);
-/*
+/*      FIXME find a way to see all relevant routes
         const methods = Object.assign({},
             ...router.stack
                 .filter(layer => layer.route)

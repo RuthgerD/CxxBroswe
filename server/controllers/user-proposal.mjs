@@ -53,7 +53,7 @@ export default class UserProposalController {
         return res.status(404).end();
     }
     static async remove(req, res) {
-        let user = await UserService.get(req.params.pid);
+        let user = await UserService.get(req.params.id);
         if(!user)
             return res.status(404).json({message: 'Object does not exist'});
         await ProposalService.prune({_id: req.params.pid, author: req.params.id});

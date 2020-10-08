@@ -24,6 +24,7 @@ import ProposalService from './services/proposal.mjs';
 import operations from './src/operations.mjs';
 
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/cxx-draft-browse';
+const port = process.env.PORT || 3000;
 
 // Connect to MongoDB
 mongoose.set('useFindAndModify', false);
