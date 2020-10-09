@@ -2,6 +2,7 @@
 import Git from 'nodegit';
 import { promises as fs, existsSync } from 'fs';
 import { execFileSync, execSync } from 'child_process';
+import git_utils from './src/git-utils.js'
 
 function invoke(command) {
     console.log('> ', command);
@@ -24,8 +25,10 @@ function invoke(command) {
     console.log('Done.');
 
     console.log('Cloning cxxdraft-htmlgen...');
-    if(!existsSync('.managed/cxxdraft-htmlgen'))
-        await Git.Clone.clone('https://github.com/Eelis/cxxdraft-htmlgen', '.managed/cxxdraft-htmlgen');
+    if(!existsSync('.managed/cxxdraft-htmlgen')) {
+        const repo = await Git.Clone.clone('https://github.com/Eelis/cxxdraft-htmlgen', '.managed/cxxdraft-htmlgen');
+        Git.Reset.reset(repo, await Git.Commit.lookup(repo, 'fd9d93df950d9ad7feb5ac44069dfde0a9f56d05'), Git.Reset.TYPE.HARD, {});
+    }
     console.log('Done.');
 
     console.log('Building...');
