@@ -20,7 +20,7 @@ export default function(Service){
                 const obj = await Service.create(req.body);
                 if(!obj)
                     return res.status(400).json({message: 'Malformed object'});
-                return res.status(200).send(obj._id);
+                return res.status(201).send(obj._id);
         }
         static async list(req, res) {
             const objs = await Service.list({}, '', [], list_options(req));
