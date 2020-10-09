@@ -2,6 +2,13 @@
 import mongoose from 'mongoose';
 const { Types } = mongoose;
 
+const populate = (query, population) => {
+    if(population) {
+        for (const pop of population)
+            query.populate(pop);
+    }
+};
+
 export default function(Model) {
     return class {
         static async create(content) {
@@ -13,17 +20,18 @@ export default function(Model) {
         }
         static async list(cond, proj, population, options) {
             const query = Model.find(cond, proj, options);
-            if(population) {
-                for (const pop of population)
-                    query.populate(pop);
-            }
+            populate(query, population);
             return await query.exec();
         }
-        static async one(cond, proj) {
-            return await Model.findOne(cond, proj).exec();
+        static async one(cond, proj, population) {
+            const query = Model.findOne(cond, proj);
+            populate(query, population);
+            return await query.exec();
         }
-        static async get(id, proj) {
-            return await Model.findById(id, proj).exec();
+        static async get(id, proj, population) {
+            const query = Model.findById(id, proj);
+            populate(query, population);
+            return await query.exec();
         }
         static async update(id, content) {
             return await Model.findByIdAndUpdate(id, content, {'new': true}).exec();

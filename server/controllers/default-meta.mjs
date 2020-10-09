@@ -2,6 +2,16 @@ import mongoose from 'mongoose';
 const { Types } = mongoose;
 const { ObjectId } = Types;
 
+export const list_options = (req) => {
+    let options = {
+        limit: parseInt(req.query.limit) || 16,
+        skip: parseInt(req.query.skip) || 0
+    };
+    if(req.query.sort)
+        options.sort = req.query.sort;
+    return options;
+};
+
 export default function(Service){
     return class {
         static async create(req, res) {
@@ -13,13 +23,7 @@ export default function(Service){
                 return res.status(200).send(obj._id);
         }
         static async list(req, res) {
-            let options = {
-                limit: parseInt(req.query.limit) || 16,
-                skip: parseInt(req.query.skip) || 0
-            };
-            if(req.query.sort)
-                options.sort = req.query.sort;
-            const objs = await Service.list({}, '', [], options);
+            const objs = await Service.list({}, '', [], list_options(req));
             return res.status(200).json(objs);
         }
         static async prune(req, res) {
