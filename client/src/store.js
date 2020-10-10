@@ -6,11 +6,11 @@ import axios from 'axios'
 import Vuex from 'vuex'
 
 const auth = VueAuthenticate.factory(axios, {
-  baseUrl: 'http://localhost:3000', // API domain
+  baseUrl: process.env.VUE_OAUTH_BASE_URL || 'http://dev.cxxbroswe.xyz:3000',
   providers: {
     github: {
-      clientId: 'c2ff54cacaccb53954dd',
-      redirectUri: 'http://localhost:8080/auth/callback' // Client app URL
+      clientId: process.env.GITHUB_CLIENT_ID || 'c2ff54cacaccb53954dd',
+      redirectUri: process.env.AUTH_GH_redirectUri || 'http://dev.cxxbroswe.xyz:8080/auth/callback' // Client app URL
     }
   }
 })

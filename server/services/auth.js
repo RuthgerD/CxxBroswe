@@ -5,9 +5,9 @@ const jwtTokenValidity = process.env.JWT_VALIDITY || 2629746000; // 1 month
 // Auth handler
 let providers = {
     github: {
-        clientId: 'c2ff54cacaccb53954dd',
+        clientId: process.env.GITHUB_CLIENT_ID || 'c2ff54cacaccb53954dd',
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        redirectUri: 'http://localhost:8080/auth/callback', // Your client app URL
+        redirectUri: process.env.GITHUB_REDIRECT_URI || 'http://dev.cxxbroswe.xyz:8080/auth/callback', // Your client app URL
         service: {
             tokenRequestUrl: 'https://github.com/login/oauth/access_token',
             userDetailsRequestUrl: 'https://api.github.com/user'
