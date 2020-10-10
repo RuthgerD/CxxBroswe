@@ -14,7 +14,7 @@ new Vue({
   router,
   store,
   created() {
-    this.$store.dispatch('checkLoggedIn')
+    this.$store.dispatch('fetchAll')
   },
   render: r => r(App)
 }).$mount('#app')

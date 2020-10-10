@@ -2,7 +2,7 @@
   <div>
     <std-view ref="stdview" />
     <MenuBar>
-      <control v-on:settings-applied="val => $refs.stdview.set_showing(val)" />
+      <control />
     </MenuBar>
     <MenuIcon />
   </div>
@@ -25,9 +25,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     next((vm) => {
       if (to.params.page) {
-        vm.$refs.stdview.set_showing({
-          page: to.params.page.replace('.html', '')
-        })
+        vm.$store.dispatch('setPage', to.params.page.replace('.html', ''))
       }
     })
   }

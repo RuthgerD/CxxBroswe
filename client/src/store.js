@@ -1,19 +1,7 @@
 import Vue from 'vue'
-import { Api } from '@/Api'
-import VueAuthenticate from 'vue-authenticate'
-import axios from 'axios'
+import { getStandards, authenticateUser, checkLoggedIn, getPageHtml, getAvailablePages } from '@/Api'
 
 import Vuex from 'vuex'
-
-const auth = VueAuthenticate.factory(axios, {
-  baseUrl: process.env.VUE_OAUTH_BASE_URL || 'http://dev.cxxbroswe.xyz:3000',
-  providers: {
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID || 'c2ff54cacaccb53954dd',
-      redirectUri: process.env.AUTH_GH_redirectUri || 'http://dev.cxxbroswe.xyz:8080/auth/callback' // Client app URL
-    }
-  }
-})
 
 Vue.use(Vuex)
 
@@ -21,7 +9,20 @@ export const store = new Vuex.Store({
   state: {
     isNavOpen: true,
     token: localStorage.getItem('auth_token') || null,
-    hasValidToken: false
+    hasValidToken: false,
+    standards: [],
+    stdHtmlDetails: {
+      base: null,
+      diffs: [],
+      page: null
+    },
+    stdHtml: {
+      err_pages: null,
+      availablePages: [],
+      err_src: null,
+      src: '',
+      fetching: false
+    }
   },
   mutations: {
     setLoggedIn(state, logged) {
@@ -40,26 +41,58 @@ export const store = new Vuex.Store({
     }
   },
   actions: {
-    checkLoggedIn(context) {
-      if (context.state.token) {
-        // TODO: delegate this to Api.js
-        Api.post('../auth/verify_token', { token: context.state.token })
-          .then(res => {
-            console.log('currently logged in')
-            context.commit('setLoggedIn', res.status === 200)
-          })
-          .catch(err => console.log(err))
-      } else {
-        context.commit('setLoggedIn', false)
-      }
+    fetchAll(context) {
+      context.dispatch('checkLoggedIn')
+      context.dispatch('fetchStandards')
     },
-    authenticateUser(context, provider) {
-      auth.authenticate(provider)
-        .then((res) => {
-          context.commit('setToken', res.data.access_token)
-          context.dispatch('checkLoggedIn')
-        })
-        .catch((err) => console.log(err))
+
+    // TODO: really not needed since we should just put the token in the Auth header for our requests
+    async checkLoggedIn(context) {
+      context.commit('setLoggedIn', await checkLoggedIn(context.state.token))
+    },
+
+    async authenticateUser(context, provider) {
+      context.commit('setToken', await authenticateUser(provider))
+      context.dispatch('checkLoggedIn') // TODO: not needed
+    },
+
+    async fetchStandards(context) {
+      context.state.standards = await getStandards()
+    },
+
+    async fetchHtml(context) {
+      const res = await getPageHtml(
+        context.state.stdHtmlDetails.base,
+        context.state.stdHtmlDetails.diffs,
+        context.state.stdHtmlDetails.page || 'index'
+      )
+      context.state.stdHtml.err_src = !res ? 'Could not find page' : null
+      context.state.stdHtml.src = res || ''
+    },
+
+    setPage(context, page) {
+      context.state.stdHtmlDetails.page = page
+      context.dispatch('fetchHtml')
+    },
+
+    async fetchPages(context) {
+      context.state.stdHtml.fetching = true
+      const res = await getAvailablePages(
+        context.state.stdHtmlDetails.base,
+        context.state.stdHtmlDetails.diffs
+      )
+      context.state.stdHtml.fetching = false
+
+      context.state.stdHtml.err_pages = !res ? 'Configuration could not be generated' : null
+      context.state.stdHtml.availablePages = res || []
+      if (res) { context.dispatch('fetchHtml') }
     }
+  },
+  getters: {
+    standardValName: state => state.standards.filter(val => val.aliasof && val.aliasof.hash).map(val => ({
+      value: val.aliasof.hash,
+      text: `${val.cplusplus ? 'C++' + val.cplusplus : val.name}` // TODO: have nicer formatting
+    })
+    )
   }
 })
