@@ -1080,7 +1080,7 @@
 		{
 			"id": "e042b425-088a-4a01-84a3-cb27854e91e2",
 			"key": "host",
-			"value": "http://localhost:3000"
+			"value": "http://dev.cxxbroswe.xyz:3000"
 		}
 	],
 	"protocolProfileBehavior": {}

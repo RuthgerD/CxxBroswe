@@ -25,6 +25,7 @@ import operations from './src/operations.mjs';
 
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/cxx-draft-browse';
 const port = process.env.PORT || 3000;
+const domain = process.env.BACK_END_DOMAIN || 'dev.cxxbroswe.xyz';
 
 // Connect to MongoDB
 mongoose.set('useFindAndModify', false);
@@ -132,8 +133,8 @@ const app = express();
         if (err)
             throw err;
         console.log(`Express server listening on port ${port}, in ${env} mode`);
-        console.log(`Backend: http://localhost:${port}/api/`);
-        console.log(`Frontend (production): http://localhost:${port}/`);
+        console.log(`Backend: http://${domain}:${port}/api/`);
+        console.log(`Frontend (production): http://${domain}:${port}/`);
     });
 
 })();
