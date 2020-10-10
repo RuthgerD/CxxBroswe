@@ -1,6 +1,3 @@
-// require('dotenv').config();
-// import dotenv from 'dotenv';
-
 import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
@@ -8,30 +5,26 @@ import morgan from 'morgan';
 import path from 'path';
 import cors from 'cors';
 import history from 'connect-history-api-fallback';
-import bcrypt from 'bcrypt';
 //import OAuthServer from 'express-oauth-server';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-import UserService from './services/user.mjs';
-import DiffService from './services/diff.mjs';
-import ProposalService from './services/proposal.mjs';
-import DraftCommitService from './services/draft_commit.mjs';
-import StandardService from './services/standard.mjs';
+const { ObjectId } = mongoose.Types;
 
-import mkcrud from './src/mkcrud.mjs';
-import operations from './src/operations.mjs';
-
-import pages from './routes/page.mjs';
-
+import DiffRoute from './routes/diff.mjs';
+import PageRoute from './routes/page.mjs';
+import ProposalRoute from './routes/proposal.mjs';
+import StandardRoute from './routes/standard.mjs';
+import UserRoute from './routes/user.mjs';
 import auth from './routes/auth.js';
 
-const port = process.env.PORT || 3000;
+import ProposalService from './services/proposal.mjs';
 
-const ObjectId = mongoose.Types.ObjectId;
+import operations from './src/operations.mjs';
 
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/cxx-draft-browse';
+const port = process.env.PORT || 3000;
 
 // Connect to MongoDB
 mongoose.set('useFindAndModify', false);
@@ -82,17 +75,6 @@ const app = express();
     //Auth
     app.use('/auth', auth);
 
-    app.use('/api/pages', pages);
-
-    app.patch('/api/users/:uid/change_password', async (req, res) => {
-        const user = await UserService.get(req.params.uid);
-        if (!user)
-            return res.status(404).json({ message: 'Object does not exist' });
-        user.passhash = await bcrypt.hash(req.body.password.toString(), 10);
-        await UserService.update(user._id, user);
-        return res.status(200).json({ message: 'Success' });
-    });
-
     app.patch('/api/proposals/:pid/add_version/:vid', async (req, res) => {
         let proposal = await ProposalService.get(req.params.pid);
         if (!proposal)
@@ -105,61 +87,11 @@ const app = express();
         return res.status(200).json({ message: 'Success' });
     });
 
-    app.get('/api/users/:uid/proposals', async (req, res) => {
-        const obj = await ProposalService.list({ author: req.params.uid }, 'proposals');
-        return res.status(200).json(obj);
-    });
-
-    app.post('/api/users/:uid/proposals', async (req, res) => {
-        let user = await UserService.get(req.params.uid);
-        if (!user)
-            return res.status(404).json({ message: 'Object does not exist' });
-
-        if (req.body._id !== undefined)
-            return res.status(400).json({ message: 'POST requests may not set "_id"' });
-
-        req.body._id = ObjectId();
-        req.body.author = req.params.uid;
-        const obj = await ProposalService.create(req.body);
-
-        user.proposals.push(obj._id);
-        await user.save();
-
-        return res.status(200).send(obj._id);
-    });
-
-    app.use('/api/users/:uid/proposals/:pid', async (req, res) => {
-        try {
-            switch (req.method) {
-                case 'GET': {
-                    const obj = await ProposalService.one({ _id: req.params.pid, author: req.params.uid }, 'proposals');
-                    return res.status(200).json(obj);
-                }
-                case 'DELETE': {
-                    let user = await UserService.get(req.params.uid);
-                    if (!user)
-                        return res.status(404).json({ message: 'Object does not exist' });
-
-                    await ProposalService.prune({ _id: req.params.pid, author: req.params.uid });
-
-                    user.proposals = user.proposals.filter(el => el != req.params.pid);
-                    user.save();
-
-                    return res.status(200).json(req.params.pid);
-                }
-                default:
-                    return res.status(405).json({ message: 'Unsupported method' });
-            }
-        } catch (err) {
-            console.log('Error: ', err);
-            return res.status(400).send(err);
-        }
-    });
-
-    mkcrud(app, UserService, '/api/users');
-    mkcrud(app, DiffService, '/api/diffs');
-    mkcrud(app, ProposalService, '/api/proposals');
-    mkcrud(app, StandardService, '/api/standards');
+    app.use('/api/diffs', DiffRoute);
+    app.use('/api/pages', PageRoute);
+    app.use('/api/proposals', ProposalRoute);
+    app.use('/api/standards', StandardRoute);
+    app.use('/api/users', UserRoute);
 
 
     app.use('/api/*', (req, res) => {

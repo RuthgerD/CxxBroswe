@@ -1,5 +1,6 @@
 import child_process from 'child_process';
 import { promises as fs, existsSync } from 'fs';
+import { promisify } from 'util';
 import Agenda from 'agenda';
 import Git from 'nodegit';
 import touch from 'touch';
@@ -8,14 +9,17 @@ import DraftCommitService from '../services/draft_commit.mjs';
 import StandardService from '../services/standard.mjs';
 import DiffService from '../services/diff.mjs';
 
+
+const execFile = promisify(child_process.execFile);
+
 let repo;
 const agenda = new Agenda({db: {address: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/agenda'}});
 
-const invoke_eelis_gen = () => {
+const invoke_eelis_gen = async () => {
     const env = process.env;
     env.PATH += `:${process.cwd()}/node_modules/mathjax-node-cli/bin/`;
     console.log('CWD: ', process.cwd());
-    child_process.execFileSync(`${process.cwd()}/stack`,
+    await execFile(`${process.cwd()}/stack`,
         ['exec', 'cxxdraft-htmlgen', '../draft'],
         {cwd: './.managed/cxxdraft-htmlgen', env, stdio: 'inherit'});
 };
@@ -47,7 +51,7 @@ const import_standard_hashes = async () => {
 };
 
 const gen_to = async (out) => {
-    invoke_eelis_gen();
+    await invoke_eelis_gen();
     await fs.rename('.managed/cxxdraft-htmlgen/14882', out);
 };
 
