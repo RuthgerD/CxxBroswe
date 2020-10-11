@@ -9,11 +9,6 @@ const routes = [
     path: '/',
     name: 'main',
     component: Main
-  },
-  {
-    path: '/:page',
-    name: 'main with page',
-    component: Main
   }
 ]
 

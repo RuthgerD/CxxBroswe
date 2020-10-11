@@ -21,13 +21,6 @@ export default {
     StdView,
     MenuBar,
     MenuIcon
-  },
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      if (to.params.page) {
-        vm.$store.dispatch('setPage', to.params.page.replace('.html', ''))
-      }
-    })
   }
 }
 </script>

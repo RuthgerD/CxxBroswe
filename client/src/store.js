@@ -5,6 +5,9 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+const linkRe = /(?<=<[^>]*? [^>]*?)(?<full_href>href=["'](?<page>[^"']+)\.html(?:#(?<goto>.*?)|(?:.*?))["'])(?=[^>]*>)/gm
+const gotoRe = /(?<=<[^>]*? [^>]*?)(?<full_href>href=["'](?:#(?<goto>.*?))["'])(?=[^>]*>)/gm
+
 export const store = new Vuex.Store({
   state: {
     isNavOpen: true,
@@ -14,13 +17,15 @@ export const store = new Vuex.Store({
     stdHtmlDetails: {
       base: null,
       diffs: [],
-      page: null
+      page: null,
+      hash: null
     },
     stdHtml: {
       err_pages: null,
       availablePages: [],
       err_src: null,
       src: '',
+      hash: null,
       fetching: false
     }
   },
@@ -60,19 +65,30 @@ export const store = new Vuex.Store({
       context.state.standards = await getStandards()
     },
 
-    async fetchHtml(context) {
+    async fetchHtml(context, hash = null) {
       const res = await getPageHtml(
         context.state.stdHtmlDetails.base,
         context.state.stdHtmlDetails.diffs,
         context.state.stdHtmlDetails.page || 'index'
       )
       context.state.stdHtml.err_src = !res ? 'Could not find page' : null
-      context.state.stdHtml.src = res || ''
+
+      if (res) {
+        const linkPass = await res.replaceAll(linkRe, 'cxx-page="$2" cxx-goto="$3" style="cursor: pointer;" class="cxx-test" title="$2 #$3"')
+        const gotoPass = await linkPass.replaceAll(gotoRe, 'cxx-goto="$2" style="cursor: pointer;" class="cxx-test" title="#$2"')
+
+        context.state.stdHtml.src = gotoPass
+        context.state.stdHtml.hash = hash
+      } else { context.state.stdHtml.src = '' }
     },
 
-    setPage(context, page) {
+    setPage(context, page, hash = null) {
       context.state.stdHtmlDetails.page = page
-      context.dispatch('fetchHtml')
+      context.dispatch('fetchHtml', hash)
+    },
+
+    setPageHash(context, hash) {
+      context.state.stdHtmlDetails.hash = hash
     },
 
     async fetchPages(context) {
