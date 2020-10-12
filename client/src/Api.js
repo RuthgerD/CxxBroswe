@@ -18,8 +18,8 @@ const auth = VueAuthenticate.factory(Api, {
   }
 })
 
-async function defaultGet(url, errRet = null, options = {}) {
-  return Api.get(url, options).then(res => res.data).catch(_ => errRet)
+async function defaultGet(url, defaultReturn = null, options = {}) {
+  return Api.get(url, options).then(res => res.data).catch(_ => defaultReturn)
 }
 
 export function getStandards() {
