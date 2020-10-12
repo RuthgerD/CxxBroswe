@@ -7,7 +7,7 @@
 
       <b-form-select
         v-model="base_commit"
-        :options="base_commits"
+        :options="standardValName"
         size="sm"
         class="mt-1 cxx-select"
         v-bind:disabled="disabled"
@@ -76,8 +76,7 @@ import Splitdiv from './Splitdiv.vue'
 import RightJust from './RightJust.vue'
 import AccountPreview from './AccountPreview.vue'
 import LoginButton from './auth/Login'
-import { mapState } from 'vuex'
-import { Api } from '@/Api.js'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'Control',
@@ -88,12 +87,10 @@ export default {
     LoginButton
   },
   data() {
-    this.get_base()
     return {
       disabled: false,
       base_commit: null,
       diff_file: null,
-      base_commits: [],
       patch_type: null,
       patch_types: [
         { value: null, text: 'None' },
@@ -104,30 +101,12 @@ export default {
     }
   },
   computed: {
-    ...mapState(['hasValidToken'])
+    ...mapState(['hasValidToken']),
+    ...mapGetters(['standardValName'])
   },
   methods: {
-    get_base() {
-      const ret = [{ value: null, text: 'HEAD' }]
-      Api.get('/standards')
-        .then((res) =>
-          res.data.forEach((el) =>
-            ret.push({
-              value: el._id,
-              text: `${el.cplusplus ? 'C++' + el.cplusplus : el.name}`
-            })
-          )
-        ) // formating TBD
-        .catch((err) => {
-          console.log(err)
-        })
-        .then(() => {
-          this.base_commits = ret
-        })
-    },
-
     emit_apply() {
-      this.$emit('settings-applied', { commit: this.base_commit, diffs: [] })
+      this.$store.dispatch('fetchPages', { baseHash: 'HEAD', diffs: [] })
     }
   }
 }

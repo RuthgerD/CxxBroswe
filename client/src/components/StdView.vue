@@ -1,60 +1,57 @@
 <template>
-  <b-container class="html-holder pt-5">
-    <b-col v-html="html_content" />
+  <b-container class="html-holder pt-5" >
+    <b-col v-html="stdHtml.src" @click="captureClick"/>
   </b-container>
 </template>
 
 <script>
-import { Api } from '@/Api.js'
+import { mapState } from 'vuex'
 
 export default {
   name: 'StdView',
-  data() {
-    return {
-      fetching: false,
-      html_content: '',
-      commit: null,
-      pr: null,
-      proposal: null,
-      diffs: [],
-      page: 'index'
+  computed: {
+    ...mapState(['stdHtml', 'stdHtmlDetails'])
+  },
+  watch: {
+    stdHtml: {
+      handler: function (oldv, newv) {
+        window.scrollTo(0, 0)
+        if (newv.hash) { this.handleGoto(newv.hash) }
+      },
+      deep: true
+    },
+    stdHtmlDetails: {
+      handler: function (oldv, newv) {
+        this.handleGoto(newv.hash)
+      },
+      deep: true
     }
   },
   methods: {
-    set_showing(
-      options = {
-        page: 'index',
-        commit: 'HEAD',
-        diffs: []
-      }
-    ) {
-      this.commit = options.commit || this.commit
-      this.diffs = options.diffs || this.diffs
-      this.page = options.page || this.page
-      this.refresh()
+    captureClick(ev) {
+      if (!ev.target) { return }
+
+      const newPage = ev.target.getAttribute('cxx-page')
+      const newGoto = ev.target.getAttribute('cxx-goto')
+
+      if (newPage) {
+        this.$store.dispatch('setPage', newPage, newGoto)
+      } else if (newGoto) { this.$store.dispatch('setPageHash', newGoto) }
     },
-    refresh() {
-      this.fetching = true
-      Api.get(
-        `/pages/${
-          this.page || this.default_page
-        }?diffs=[${this.diffs.toString()}]`
-      )
-        .then((res) => {
-          this.html_content = res.data
+    handleGoto(hash) {
+      Array.from(document.getElementsByClassName('cxx-close')).forEach(elem => {
+        elem.style.display = 'none'
+        elem.classList.remove('cxx-close')
+      })
+
+      const scrollTo = document.getElementById(hash)
+      if (scrollTo) {
+        Array.from(scrollTo.getElementsByClassName('tocChapter')).forEach(elem => {
+          elem.style.display = 'block'
+          elem.classList.add('cxx-close')
         })
-        .catch((err) => {
-          this.html_content = err
-        })
-        .finally(() => {
-          this.fetching = false
-        })
-    }
-  },
-  props: {
-    default_page: {
-      type: String,
-      default: 'index'
+        scrollTo.scrollIntoView()
+      }
     }
   }
 }
