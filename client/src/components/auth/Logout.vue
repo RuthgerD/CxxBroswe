@@ -1,19 +1,14 @@
 <template>
   <b-button
-    @click="logout()"
+    @click="$store.dispatch('logout')"
     class="btn-danger logout-btn">Logout
   </b-button>
 </template>
 
 <script>
-import { mutations } from '../../store'
 
 export default {
-  methods: {
-    logout() {
-      mutations.destroyToken()
-    }
-  }
+  name: 'logout'
 }
 </script>
 

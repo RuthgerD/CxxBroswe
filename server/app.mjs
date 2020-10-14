@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
@@ -5,7 +6,6 @@ import morgan from 'morgan';
 import path from 'path';
 import cors from 'cors';
 import history from 'connect-history-api-fallback';
-//import OAuthServer from 'express-oauth-server';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -17,7 +17,9 @@ import PageRoute from './routes/page.mjs';
 import ProposalRoute from './routes/proposal.mjs';
 import StandardRoute from './routes/standard.mjs';
 import UserRoute from './routes/user.mjs';
-import auth from './routes/auth.js';
+import AuthRoute from './routes/auth.mjs';
+
+import { authoriseRequest } from './services/auth.mjs';
 
 import ProposalService from './services/proposal.mjs';
 
@@ -46,6 +48,7 @@ const app = express();
     await operations.gen_all_static();
     console.log('Init done');
 
+    dotenv.config()
     // Parse requests of content-type 'application/json'
     app.use(bodyParser.json());
     // HTTP request logger
@@ -54,17 +57,6 @@ const app = express();
     app.options('*', cors());
     app.use(cors());
 
-    // Import routes
-    /*
-    const authorize = app.oauth.authorize();
-    app.use((req, res, next) => {
-        if(req.method != 'GET')
-            authorize(req, res, next);
-        else
-        next();
-    });
-    */
-
     app.get('/api', async (req, res) => {
         res.json({ 'message': 'Welcome to your DIT341 backend ExpressJS project!' });
     });
@@ -72,9 +64,6 @@ const app = express();
     app.get('/api/version', async (req, res) => {
         res.json(1);
     });
-
-    //Auth
-    app.use('/auth', auth);
 
     app.patch('/api/proposals/:pid/add_version/:vid', async (req, res) => {
         let proposal = await ProposalService.get(req.params.pid);
@@ -88,6 +77,7 @@ const app = express();
         return res.status(200).json({ message: 'Success' });
     });
 
+    app.use('/auth', AuthRoute);
     app.use('/api/diffs', DiffRoute);
     app.use('/api/pages', PageRoute);
     app.use('/api/proposals', ProposalRoute);

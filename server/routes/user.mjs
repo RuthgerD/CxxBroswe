@@ -4,7 +4,8 @@ import UserProposalController from '../controllers/user-proposal.mjs';
 
 const UserRoute = default_metaroute(UserController);
 
-UserRoute.patch('/:id/password', UserController.change_password);
+UserRoute
+    .get('/:id', UserController.get);
 
 UserRoute
     .route('/:id/proposals/:pid')

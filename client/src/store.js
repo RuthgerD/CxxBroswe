@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { getStandards, authenticateUser, checkLoggedIn, getPageHtml, getAvailablePages } from '@/Api'
+import { getStandards, authenticateUser, getUserDetails, getPageHtml, getAvailablePages } from '@/Api'
 
 import Vuex from 'vuex'
 
@@ -12,6 +12,8 @@ export const store = new Vuex.Store({
   state: {
     isNavOpen: true,
     token: localStorage.getItem('auth_token') || null,
+    userId: localStorage.getItem('user_id') || null,
+    currentUser: null,
     hasValidToken: false,
     standards: [],
     stdHtmlDetails: {
@@ -37,6 +39,13 @@ export const store = new Vuex.Store({
       state.token = token
       localStorage.setItem('auth_token', token)
     },
+    setUserId(state, userId) {
+      state.userId = userId
+      localStorage.setItem('user_id', userId)
+    },
+    setCurrentUser(state, user) {
+      state.currentUser = user
+    },
     destroyToken(state) {
       state.token = null
       localStorage.removeItem('auth_token')
@@ -46,19 +55,35 @@ export const store = new Vuex.Store({
     }
   },
   actions: {
+    async getUserDetails(context) {
+      console.log('getUserDetails')
+      if (context.state.token && context.state.userId) {
+        try {
+          const res = await getUserDetails(context.state.token, context.state.userId)
+          const loggedIn = res.status === 200
+          context.commit('setLoggedIn', loggedIn)
+          context.commit('setCurrentUser', res.data.user)
+        } catch (error) {
+          context.commit('setLoggedIn', false)
+        }
+      } else {
+        context.commit('setLoggedIn', false)
+      }
+    },
+    logout(context) {
+      context.commit('setToken', null)
+      context.dispatch('getUserDetails')
+    },
     fetchAll(context) {
-      context.dispatch('checkLoggedIn')
+      context.dispatch('getUserDetails')
       context.dispatch('fetchStandards')
     },
 
-    // TODO: really not needed since we should just put the token in the Auth header for our requests
-    async checkLoggedIn(context) {
-      context.commit('setLoggedIn', await checkLoggedIn(context.state.token))
-    },
-
     async authenticateUser(context, provider) {
-      context.commit('setToken', await authenticateUser(provider))
-      context.dispatch('checkLoggedIn') // TODO: not needed
+      const res = await authenticateUser(provider)
+      context.commit('setToken', res.access_token)
+      context.commit('setUserId', res.userId)
+      context.dispatch('getUserDetails')
     },
 
     async fetchStandards(context) {
