@@ -2,11 +2,21 @@ import mongoose from 'mongoose';
 const { model, Types } = mongoose;
 const { ObjectId } = Types;
 
-const User = model('User', {
-    name: {type: String, required: true, unique: true},
-    passhash: String, // not required, since system users are loginless
-    diffs: [{type: ObjectId, ref: 'Diff'}],
-    proposals: [{type: ObjectId, ref: 'Proposal'}]
+export const User = model('User', {
+    name: { type: String, required: true },
+    external_id: { type: Number },
+    login: { type: String },
+    avatar_url: { type: String, required: true },
+    location: { type: String },
+    email: { type: String },
+    bio: { type: String },
+    role: { type: String, required: true },
+    created_at: { type: Date },
+    updated_at: { type: Date },
+    source: { type: String, required: true },
+
+    diffs: [{ type: ObjectId, ref: 'Diff' }],
+    proposals: [{ type: ObjectId, ref: 'Proposal' }]
 });
 
 export default User;

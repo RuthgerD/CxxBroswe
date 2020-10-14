@@ -13,7 +13,7 @@ const auth = VueAuthenticate.factory(Api, {
   providers: {
     github: {
       clientId: 'c2ff54cacaccb53954dd',
-      redirectUri: 'http://localhost:8080/auth/callback' // Client app URL
+      redirectUri: 'http://dev.cxxbroswe.xyz:8080/auth/callback' // Client app URL
     }
   }
 })
@@ -45,13 +45,10 @@ export function getPageHtml(base, diffs, page) {
 
 export function authenticateUser(provider) {
   return auth.authenticate(provider)
-    .then((res) => res.data.access_token)
+    .then((res) => res.data)
     .catch(_ => null)
 }
 
-export function checkLoggedIn(token) {
-  if (!token) { return false }
-  return Api.post('../auth/verify_token', { token })
-    .then(res => res.status === 200)
-    .catch(_ => false)
+export async function getUserDetails(token, userId) {
+  return await Api.get('/users/' + userId, { headers: { authorization: 'Bearer ' + token } })
 }
