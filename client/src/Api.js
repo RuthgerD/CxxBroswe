@@ -50,5 +50,5 @@ export function authenticateUser(provider) {
 }
 
 export async function getUserDetails(token, userId) {
-  return await Api.get('/users/' + userId, { headers: { authorization: 'Bearer ' + token } })
+  return await Api.get('/users/' + userId)
 }
