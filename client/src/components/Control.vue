@@ -10,7 +10,7 @@
         :options="standardValName"
         size="sm"
         class="mt-1 cxx-select"
-        v-bind:disabled="disabled"
+        :disabled="stdHtml.fetching"
       >
         <template v-slot:first>
           <b-form-select-option value="" disabled
@@ -22,11 +22,11 @@
       <a class="inset">Patch type:</a><br />
 
       <b-form-select
-        v-model="patch_type"
+        v-model="$store.state.patch_type"
         :options="patch_types"
         size="sm"
         class="mt-1 cxx-select"
-        v-bind:disabled="disabled"
+        :disabled="stdHtml.fetching"
       >
         <template v-slot:first>
           <b-form-select-option value="" disabled
@@ -35,32 +35,46 @@
         </template>
       </b-form-select>
 
-      <b-collapse class="mt-2" v-bind:visible="patch_type === 'diff'">
+      <b-collapse class="mt-2" :visible="$store.state.patch_type === 'diff'">
         <b-tabs content-class="mt-3">
-          <b-tab title="Upload" active>
-            <b-form-file
-              v-model="diff_file"
-              :state="Boolean(diff_file)"
-              placeholder="Choose a file or drop it here..."
-            ></b-form-file>
+          <b-tab title="Upload">
+            <diff-uploader :disabled="stdHtml.fetching" />
           </b-tab>
-          <b-tab title="Profile"> <p>I'm the second tab</p></b-tab>
+          <b-tab title="Profile" :disabled="!hasValidToken">
+            <template  v-slot:title>
+              Profile {{currentUser ? ' - ' + currentUser.diffs.length : ''}}
+            </template>
+            <div v-if="currentUser">
+              <selectable-list
+                v-model="$store.state.selectedProfileDiffs"
+                :data="currentUser.diffs.slice(usrPage * 4, usrPage * 4 + 4)"
+                :formatter="(el) => el.name"
+                :on="'_id'"
+                :disabled="stdHtml.fetching"
+              />
+              <pager v-model="usrPage" :llim="0" :disabled="stdHtml.fetching" />
+            </div>
+            <a v-else class="danger"> No diffs found!</a>
+          </b-tab>
         </b-tabs>
       </b-collapse>
 
-      <b-collapse class="mt-2" v-bind:visible="patch_type === 'pr'">
-        pr
+      <b-collapse class="mt-2" :visible="$store.state.patch_type === 'pr'">
+        <cpp-pull-list :disabled="stdHtml.fetching" />
       </b-collapse>
 
-      <b-collapse class="mt-2" v-bind:visible="patch_type === 'proposal'">
+      <b-collapse
+        class="mt-2"
+        :visible="$store.state.patch_type === 'proposal'"
+      >
         proposal
       </b-collapse>
 
       <right-just class="mt-2"
         ><b-button
           variant="primary"
-          @click="emit_apply()"
-          v-bind:disabled="disabled"
+          @click="$store.dispatch('fetchPages')"
+          :disabled="stdHtml.fetching"
           >apply</b-button
         ></right-just
       >
@@ -77,6 +91,10 @@ import RightJust from './RightJust.vue'
 import AccountPreview from './AccountPreview.vue'
 import LoginButton from './auth/Login'
 import { mapGetters, mapState } from 'vuex'
+import DiffUploader from './DiffUploader'
+import CppPullList from './CppPullList'
+import Pager from './Pager'
+import SelectableList from './SelectableList'
 
 export default {
   name: 'Control',
@@ -84,14 +102,17 @@ export default {
     Splitdiv,
     RightJust,
     AccountPreview,
-    LoginButton
+    LoginButton,
+    DiffUploader,
+    CppPullList,
+    Pager,
+    SelectableList
   },
   data() {
     return {
-      disabled: false,
       base_commit: null,
-      diff_file: null,
-      patch_type: null,
+      disabled: false,
+      usrPage: 0,
       patch_types: [
         { value: null, text: 'None' },
         { value: 'diff', text: 'diff' },
@@ -101,18 +122,13 @@ export default {
     }
   },
   computed: {
-    ...mapState(['hasValidToken']),
+    ...mapState(['hasValidToken', 'stdHtml', 'currentUser']),
     ...mapGetters(['standardValName'])
-  },
-  methods: {
-    emit_apply() {
-      this.$store.dispatch('fetchPages', { baseHash: 'HEAD', diffs: [] })
-    }
   }
 }
 </script>
 
-<style scoped>
+<style>
 .control {
   display: flex;
   flex-direction: column;

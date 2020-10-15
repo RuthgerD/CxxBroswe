@@ -22,8 +22,16 @@ async function defaultGet(url, defaultReturn = null, options = {}) {
   return Api.get(url, options).then(res => res.data).catch(_ => defaultReturn)
 }
 
+async function defaultPost(url, body, options = {}) {
+  return Api.post(url, body, options).then(res => res.data).catch(_ => null)
+}
+
 export function getStandards() {
   return defaultGet('/standards', [])
+}
+
+export function getDiff(id) {
+  return defaultGet(`/diffs/${id}`, null)
 }
 
 export async function getAvailablePages(base, diffs, maxLoops = 100, timeout = 4000) {
@@ -31,7 +39,6 @@ export async function getAvailablePages(base, diffs, maxLoops = 100, timeout = 4
 
   for (let i = 0; i < maxLoops; ++i) {
     const res = await isAvailable()
-
     if (!res || res.status === 204) { return null }
     if (res.status === 200) { return res.data }
 
@@ -50,5 +57,22 @@ export function authenticateUser(provider) {
 }
 
 export async function getUserDetails(token, userId) {
-  return await Api.get('/users/' + userId)
+  return await defaultGet(`/users/${userId}`, null, { headers: { authorization: 'Bearer ' + token } })
+}
+
+export function createDiff(author, content, name) {
+  return defaultPost('/diffs', { author, content, name })
+}
+
+export async function getCPPPulls(page, amount) {
+  return axios.get('https://api.github.com/repos/cplusplus/draft/pulls', { params: { page, per_page: amount } }).then(res => res.data).catch(_ => null)
+}
+
+export async function getCPPDiff(number) {
+  return defaultGet(`/gh_patch/${number}`, null)
+}
+
+export async function putUser(token, userId, newUserData, oldUserData = {}) {
+  const res = Api.put(`/users/${userId}`, { ...oldUserData, ...newUserData }, { headers: { authorization: 'Bearer ' + token } }).catch(_ => null)
+  return res
 }

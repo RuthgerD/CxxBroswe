@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { getStandards, authenticateUser, getUserDetails, getPageHtml, getAvailablePages } from '@/Api'
+import { getStandards, authenticateUser, getUserDetails, getPageHtml, getAvailablePages, createDiff, getCPPPulls, getCPPDiff, putUser, getDiff } from '@/Api'
 
 import Vuex from 'vuex'
 
@@ -16,6 +16,14 @@ export const store = new Vuex.Store({
     currentUser: null,
     hasValidToken: false,
     standards: [],
+    patch_type: null,
+    githubPulls: {
+      page: 1,
+      amount: 5,
+      data: [],
+      selected: [],
+      fetching: false
+    },
     stdHtmlDetails: {
       base: null,
       diffs: [],
@@ -29,12 +37,11 @@ export const store = new Vuex.Store({
       src: '',
       hash: null,
       fetching: false
-    }
+    },
+    pendingDiffs: [],
+    selectedProfileDiffs: []
   },
   mutations: {
-    setLoggedIn(state, logged) {
-      state.hasValidToken = logged
-    },
     setToken(state, token) {
       state.token = token
       localStorage.setItem('auth_token', token)
@@ -42,9 +49,6 @@ export const store = new Vuex.Store({
     setUserId(state, userId) {
       state.userId = userId
       localStorage.setItem('user_id', userId)
-    },
-    setCurrentUser(state, user) {
-      state.currentUser = user
     },
     destroyToken(state) {
       state.token = null
@@ -56,27 +60,32 @@ export const store = new Vuex.Store({
   },
   actions: {
     async getUserDetails(context) {
-      console.log('getUserDetails')
-      if (context.state.token && context.state.userId) {
-        try {
-          const res = await getUserDetails(context.state.token, context.state.userId)
-          const loggedIn = res.status === 200
-          context.commit('setLoggedIn', loggedIn)
-          context.commit('setCurrentUser', res.data.user)
-        } catch (error) {
-          context.commit('setLoggedIn', false)
+      context.state.hasValidToken = false
+      if (!context.state.token || !context.state.userId) { return }
+
+      const res = await getUserDetails(context.state.token, context.state.userId)
+
+      if (res) {
+        context.state.hasValidToken = true
+        const wait = []
+        for (const diffId of res.user.diffs) {
+          wait.push(getDiff(diffId))
         }
-      } else {
-        context.commit('setLoggedIn', false)
+        const diffs = await Promise.all(wait)
+        res.user.diffs = diffs.filter(el => el !== null)
+        context.state.currentUser = res.user
       }
     },
+
     logout(context) {
       context.commit('setToken', null)
       context.dispatch('getUserDetails')
     },
+
     fetchAll(context) {
       context.dispatch('getUserDetails')
       context.dispatch('fetchStandards')
+      context.dispatch('fetchCPPPulls')
     },
 
     async authenticateUser(context, provider) {
@@ -118,15 +127,67 @@ export const store = new Vuex.Store({
 
     async fetchPages(context) {
       context.state.stdHtml.fetching = true
+
+      let newDiff = false
+      switch (context.state.patch_type) {
+        case 'diff':
+          for (const el of context.state.pendingDiffs) {
+            if (!newDiff) { await context.dispatch('getUserDetails'); newDiff = true }
+            const newDiffId = await createDiff(context.state.hasValidToken ? context.state.userId : null, await el.data, el.name)
+            if (newDiffId) {
+              if (context.state.hasValidToken) {
+                context.state.currentUser.diffs.push(newDiffId)
+              }
+              context.state.stdHtmlDetails.diffs.push(newDiffId)
+            }
+          }
+          if (newDiff) { await context.dispatch('syncUser') }
+          break
+        case 'pr':
+          for (const el of context.state.githubPulls.selected) {
+            const patchData = await getCPPDiff(el.number)
+            if (!patchData) { continue }
+            const newDiffId = await createDiff(null, patchData, el.title)
+            if (newDiffId) { context.state.stdHtmlDetails.diffs.push(newDiffId) }
+          }
+          break
+        case 'proposal':
+          break
+      }
+
       const res = await getAvailablePages(
         context.state.stdHtmlDetails.base,
-        context.state.stdHtmlDetails.diffs
+        context.state.stdHtmlDetails.diffs.concat(context.state.selectedProfileDiffs.map(el => el._id))
       )
       context.state.stdHtml.fetching = false
 
       context.state.stdHtml.err_pages = !res ? 'Configuration could not be generated' : null
       context.state.stdHtml.availablePages = res || []
       if (res) { context.dispatch('fetchHtml') }
+    },
+
+    async fetchCPPPulls(context) {
+      context.state.githubPulls.fetching = true
+      const res = await getCPPPulls(context.state.githubPulls.page, context.state.githubPulls.amount)
+      context.state.githubPulls.fetching = false
+
+      if (res) {
+        context.state.githubPulls.data = res.filter(el => el.base.ref === 'master' && el.state === 'open').map(el => ({ name: el.title, number: el.number, base: el.base.sha }))
+      } else { context.state.githubPulls.data = [] }
+    },
+
+    movePRPage(context, next) {
+      if (next) {
+        context.state.githubPulls.page += 1
+      } else if (context.state.githubPulls.page > 0 && !next) {
+        context.state.githubPulls.page -= 1
+      } else { return }
+      context.dispatch('fetchCPPPulls')
+    },
+
+    async syncUser(context) {
+      const res = await putUser(context.state.token, context.state.userId, context.state.currentUser)
+      if (res) { await context.dispatch('getUserDetails') }
     }
   },
   getters: {
