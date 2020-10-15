@@ -1,14 +1,22 @@
 <template>
   <div class="profileViewBody">
     <b-img
+      v-if="currentUser.avatar_url!=null"
       width="48"
       height="48"
-      class="m1"
+      class="m-1"
       style="border: 1px solid var(--primary)"
       rounded="circle"
       alt="profile picture"
       v-bind:src="currentUser.avatar_url"
     />
+    <div v-else>
+      <b-avatar
+      class="m-1"
+      style="border: 1px solid var(--primary)"
+      rounded="circle"
+      />
+    </div>
     <a class="profileText">{{ currentUser.name }}<br />
       <span style="color: grey;">
       <p v-if="currentUser.email" class="m-0" >{{ currentUser.email }}</p>
