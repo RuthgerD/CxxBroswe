@@ -20,6 +20,7 @@ import UserRoute from './routes/user.mjs';
 import AuthRoute from './routes/auth.mjs';
 
 import { authoriseRequest } from './services/auth.mjs';
+import ghPatchRoute from './routes/gh_patch.mjs'
 
 import ProposalService from './services/proposal.mjs';
 
@@ -57,6 +58,12 @@ const app = express();
     app.options('*', cors());
     app.use(cors());
 
+    app.use(function(req, res, next) {
+      res.header('Access-Control-Allow-Origin', '*');
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+      next();
+    });
+
     app.get('/api', async (req, res) => {
         res.json({ 'message': 'Welcome to your DIT341 backend ExpressJS project!' });
     });
@@ -83,7 +90,7 @@ const app = express();
     app.use('/api/proposals', ProposalRoute);
     app.use('/api/standards', StandardRoute);
     app.use('/api/users', UserRoute);
-
+    app.use('/api/gh_patch', ghPatchRoute)
 
     app.use('/api/*', (req, res) => {
         res.status(404).json({ 'message': 'Not Found' });
