@@ -89,7 +89,7 @@ const app = express();
     app.use('/api/pages', PageRoute);
     app.use('/api/proposals', ProposalRoute);
     app.use('/api/standards', StandardRoute);
-    app.use('/api/users', UserRoute);
+    app.use('/api/users', authoriseRequest, UserRoute);
     app.use('/api/gh_patch', ghPatchRoute)
 
     app.use('/api/*', (req, res) => {
