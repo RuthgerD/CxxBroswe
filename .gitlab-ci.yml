@@ -5,11 +5,7 @@ cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
     - server/node_modules/
-    - server/.managed/cache/
-    - server/.managed/draft/
-    - server/.managed/cxxdraft-htmlgen/
     - server/stack
-    - /root/.stack
 stages:
   - build
   - test
