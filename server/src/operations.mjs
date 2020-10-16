@@ -10,6 +10,12 @@ import StandardService from '../services/standard.mjs';
 import DiffService from '../services/diff.mjs';
 
 
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
+
 const execFile = promisify(legacyExecFile);
 
 let draft_repo;
@@ -58,6 +64,7 @@ export const build_eelis_gen = async (gen_sha) => {
     await force_override_resolver();
     console.log('Building...');
     execSync(`${stack_path} config set system-ghc --global true`);
+    await sleep(3000);
     execFileSync(`${process.cwd()}/stack`,
         ['build', '--copy-bins', '--local-bin-path', out_path, './'],
         {cwd: '.managed/cxxdraft-htmlgen', stdio: 'inherit'});
