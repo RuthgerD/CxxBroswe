@@ -15,7 +15,7 @@ export default class UserController extends default_metacontroller(UserService) 
             //TODO: Implement role check (out of scope for current period)
             return res.status(401).json({ 'message': 'Unauthorised' });
         }
-        return res.status(200).json({ user });
+        return res.status(200).json(user);
     }
 
     static async isSameUser(req, user) {
