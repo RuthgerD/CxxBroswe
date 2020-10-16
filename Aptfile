@@ -1,4 +1,4 @@
-build-essential
+make
 curl
 graphviz
 git
