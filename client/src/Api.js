@@ -8,8 +8,8 @@ export const Api = axios.create({
 
 Api.defaults.paramsSerializer = (params) => qs.stringify(params, { arrayFormat: 'brackets', encode: false })
 
-const auth = VueAuthenticate.factory(Api, {
-  baseUrl: '..',
+const auth = VueAuthenticate.factory(axios.create({ baseURL: Api.baseURL }), {
+  baseUrl: `${Api.baseURL}/..`,
   providers: {
     github: {
       clientId: 'c2ff54cacaccb53954dd',
