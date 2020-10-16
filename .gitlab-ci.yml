@@ -44,7 +44,7 @@ test:
     - ln -s /usr/lib/libncursesw.so.6 /usr/lib/libtinfo.so.6
     - cd server
     - ./stack config set system-ghc --global true
-    - npm run postinstall
+    - npm run prestart
     - npm run ci-test
 
 deploy:
