@@ -2,18 +2,18 @@
   "name": "server",
   "version": "0.1.0",
   "engines": {
-    "node": "12.x"
+    "node": "14.x"
   },
   "private": true,
   "description": "Template for ExpressJS API with Mongoose for Web and Mobile Engineering (DIT341)",
   "main": "./app.js",
   "scripts": {
     "start": "node ./app.mjs",
-    "dev": "nodemon ./app.mjs",
+    "dev": "SKIP_AUTH=1 nodemon ./app.mjs",
     "lint": "eslint .",
     "test": "cross-env-shell MONGODB_URI=mongodb://localhost:27017/serverTestDB \"npm run newman-server\"",
     "ci-test": "npm run newman-server",
-    "newman-server": "cross-env-shell PORT=3001 \"npm run dropdb && run-p --race start newman-wait\"",
+    "newman-server": "cross-env-shell PORT=3001 SKIP_AUTH=1 \"npm run dropdb && run-p --race start newman-wait\"",
     "newman-wait": "wait-on http://localhost:3001/api && npm run newman",
     "newman": "newman run ./tests/server.postman_collection.json --env-var host=http://localhost:3001",
     "dropdb": "node ./tests/dropdb.js",

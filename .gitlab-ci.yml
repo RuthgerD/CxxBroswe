@@ -19,6 +19,11 @@ build:
   stage: build
   tags:
     - docker
+  services:
+    - name: mvertes/alpine-mongo:latest
+      alias: mongo
+  variables:
+    MONGODB_URI: "mongodb://mongo:27017/serverTestDB"
   script:
     - apk add -q ghc python tzdata pkgconfig build-base libgit2-dev krb5-dev pcre curl
     - ghc --version

@@ -214,7 +214,7 @@
 							"script": {
 								"id": "b22e6f01-0787-494a-9607-1bf20626277b",
 								"exec": [
-									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"pm.test(\"Status\", () => pm.response.to.have.status(201))",
 									"",
 									"pm.environment.set(\"user_id\", pm.response.json())"
 								],
@@ -233,7 +233,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{user_name}}\"\n}\n",
+							"raw": "{\n    \"name\": \"{{user_name}}\", \"avatar_url\": \"file://ugly.png\", \"role\": \"none\", \"source\": \"dest\"\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -248,48 +248,6 @@
 							"path": [
 								"api",
 								"users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Change password",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "8b5d3ceb-4d0c-4db4-84a4-527694e0e77f",
-								"exec": [
-									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"password\": \"ilikeducks\"\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host}}/api/users/{{user_id}}/password",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"{{user_id}}",
-								"password"
 							]
 						}
 					},
@@ -350,7 +308,7 @@
 							"script": {
 								"id": "c9338c24-e07f-43cf-8e9f-f276224f0b23",
 								"exec": [
-									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"pm.test(\"Status\", () => pm.response.to.have.status(201))",
 									"",
 									"pm.environment.set(\"diff_id\", pm.response.json())"
 								],
@@ -483,7 +441,7 @@
 							"script": {
 								"id": "c6ddce75-dd8a-4c21-876e-0b4980ecdd1c",
 								"exec": [
-									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
+									"pm.test(\"Status\", () => pm.response.to.have.status(201))",
 									"",
 									"pm.environment.set(\"proposal_id\", pm.response.json())"
 								],

@@ -5,6 +5,7 @@ const { ObjectId } = Types;
 const Standard = model('Standard', {
     name: {type: String, required: true, unique: true},
     aliasof: {type: ObjectId, ref: 'DraftCommit', required: true},
+    gen_sha: String,
     iso_name: String,
     cplusplus: Number,
 });

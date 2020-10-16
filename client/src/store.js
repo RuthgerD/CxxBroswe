@@ -68,12 +68,12 @@ export const store = new Vuex.Store({
       if (res) {
         context.state.hasValidToken = true
         const wait = []
-        for (const diffId of res.user.diffs) {
+        for (const diffId of res.diffs) {
           wait.push(getDiff(diffId))
         }
         const diffs = await Promise.all(wait)
-        res.user.diffs = diffs.filter(el => el !== null)
-        context.state.currentUser = res.user
+        res.diffs = diffs.filter(el => el !== null)
+        context.state.currentUser = res
       }
     },
 
