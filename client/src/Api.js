@@ -2,18 +2,19 @@ import axios from 'axios'
 import VueAuthenticate from 'vue-authenticate'
 import qs from 'qs'
 
+const cxxURL = 'http://dev.cxxbroswe.xyz'
+
 export const Api = axios.create({
-  baseURL: process.env.VUE_APP_API_ENDPOINT || 'http://dev.cxxbroswe.xyz:3000/api'
+  baseURL: process.env.VUE_APP_API_ENDPOINT || `${cxxURL}:3000/api`
 })
 
 Api.defaults.paramsSerializer = (params) => qs.stringify(params, { arrayFormat: 'brackets', encode: false })
 
-const auth = VueAuthenticate.factory(axios.create({ baseURL: Api.baseURL }), {
-  baseUrl: `${Api.baseURL}/..`,
+const auth = VueAuthenticate.factory(axios.create({ baseURL: process.env.VUE_APP_OAUTH_BASE_URL || `${cxxURL}:3000` }), {
   providers: {
     github: {
-      clientId: 'c2ff54cacaccb53954dd',
-      redirectUri: 'http://dev.cxxbroswe.xyz:8080/auth/callback' // Client app URL
+      clientId: process.env.VUE_APP_GITHUB_CLIENT_ID || 'c2ff54cacaccb53954dd',
+      redirectUri: process.env.VUE_APP_AUTH_GH_REDIRECT_URI || `${cxxURL}:8080/auth/callback` // Client app URL
     }
   }
 })

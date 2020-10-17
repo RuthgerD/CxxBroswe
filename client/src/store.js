@@ -90,6 +90,7 @@ export const store = new Vuex.Store({
 
     async authenticateUser(context, provider) {
       const res = await authenticateUser(provider)
+      if (!res) { return }
       context.commit('setToken', res.access_token)
       context.commit('setUserId', res.userId)
       context.dispatch('getUserDetails')
