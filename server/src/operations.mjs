@@ -64,7 +64,7 @@ export const build_eelis_gen = async (gen_sha) => {
     await force_override_resolver();
     console.log('Building...');
     execSync(`${stack_path} config set system-ghc --global true`);
-    await sleep(3000);
+    await sleep(7000);
     execFileSync(`${process.cwd()}/stack`,
         ['build', '--copy-bins', '--local-bin-path', out_path, './'],
         {cwd: '.managed/cxxdraft-htmlgen', stdio: 'inherit'});
