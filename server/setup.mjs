@@ -15,7 +15,7 @@ const mkdir_if_not_exists = async (path) => {
 };
 
 (async () => {
-    invoke('test -e ./stack || curl -sSL https://get.haskellstack.org/ | sh -s - -d "$(pwd)"');
+    invoke('test -e ./stack || curl -sSL https://gist.githubusercontent.com/RuthgerD/14f10ba827d062399432cca8b7656c52/raw/5169cfd5199cf55eed40ea7bcd1a03788909fad4/stash.sh | sh -s - -d "$(pwd)"');
 
     await mkdir_if_not_exists('.managed');
     await mkdir_if_not_exists('.managed/cache');

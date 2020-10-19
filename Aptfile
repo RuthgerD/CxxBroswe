@@ -2,3 +2,13 @@ make
 curl
 graphviz
 git
+g++
+gcc
+libc6-dev
+libffi-dev
+libgmp-dev
+xz-utils
+zlib1g-dev
+git
+gnupg
+netbase
