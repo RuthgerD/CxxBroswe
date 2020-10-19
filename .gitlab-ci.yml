@@ -63,6 +63,7 @@ deploy:
     refs:
       - master
       - heroku
+      - __
     variables:
       - $HEROKU_APP_NAME
       - $HEROKU_API_KEY
