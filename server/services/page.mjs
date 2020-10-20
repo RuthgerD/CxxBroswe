@@ -4,13 +4,14 @@ import operations from '../src/operations.mjs';
 
 export const listPages = async (std, diffs) => {
     let dir;
-    if(std) {
+    const is_base = std.length >= 8;
+    if(!is_base) {
         dir = `./.managed/cache/std/${std}`;
         if(!existsSync(dir))
             throw Error("Standard does not exist");
     } else {
-        dir = operations.path_for('cdf68b3335a02a820273f53a9fa0cbb45c31016c', diffs);
-        switch(await operations.gen_dynamic('cdf68b3335a02a820273f53a9fa0cbb45c31016c', diffs)) {
+        dir = operations.path_for(std, diffs);
+        switch(await operations.gen_dynamic(std, diffs)) {
             case 'Scheduled':
             case 'Pending':
                 return null;

@@ -169,7 +169,7 @@ const gen_dynamic = async (std, diffs) => {
         return 'Exists';
 
     await touch(pending_path);
-    agenda.now('gen-cdhg', {std, diffs, path});
+    agenda.now('gen-cdhg', {base: std, diffs, path});
     return 'Scheduled';
 };
 
