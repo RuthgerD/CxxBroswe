@@ -17,6 +17,7 @@ import PageRoute from './routes/page.mjs';
 import ProposalRoute from './routes/proposal.mjs';
 import StandardRoute from './routes/standard.mjs';
 import UserRoute from './routes/user.mjs';
+import SettingsRoute from './routes/settings.mjs';
 import AuthRoute from './routes/auth.mjs';
 
 import { authoriseRequest } from './services/auth.mjs';
@@ -90,6 +91,7 @@ const app = express();
     app.use('/api/proposals', ProposalRoute);
     app.use('/api/standards', StandardRoute);
     app.use('/api/users', authoriseRequest, UserRoute);
+    app.use('/api/settings', authoriseRequest, SettingsRoute);
     app.use('/api/gh_patch', ghPatchRoute)
 
     app.use('/api/*', (req, res) => {

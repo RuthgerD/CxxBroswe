@@ -23,8 +23,16 @@ async function defaultGet(url, defaultReturn = null, options = {}) {
   return Api.get(url, options).then(res => res.data).catch(_ => defaultReturn)
 }
 
+async function defaultDelete(url, defaultReturn = null, options = {}) {
+  return Api.delete(url, options).then(res => res.data).catch(_ => defaultReturn)
+}
+
 async function defaultPost(url, body, options = {}) {
   return Api.post(url, body, options).then(res => res.data).catch(_ => null)
+}
+
+async function defaultPatch(url, body, options = {}) {
+  return Api.patch(url, body, options).then(res => res.data).catch(_ => null)
 }
 
 export function getStandards() {
@@ -61,6 +69,18 @@ export async function getUserDetails(token, userId) {
   return await defaultGet(`/users/${userId}`, null, { headers: { authorization: 'Bearer ' + token } })
 }
 
+export async function getSettings(token, settingsId) {
+  return await defaultGet(`/settings/${settingsId}`, null, { headers: { authorization: 'Bearer ' + token } })
+}
+
+export async function patchSettings(token, settingsId, settingsPatch) {
+  return await defaultPatch(`/settings/${settingsId}`, { ...settingsPatch }, { headers: { authorization: 'Bearer ' + token } })
+}
+
+export async function deleteUserAccount(token, userId) {
+  return await defaultDelete('/users/' + userId, { headers: { authorization: 'Bearer ' + token } })
+}
+
 export function createDiff(author, content, name) {
   return defaultPost('/diffs', { author, content, name })
 }
@@ -74,6 +94,6 @@ export async function getCPPDiff(number) {
 }
 
 export async function putUser(token, userId, newUserData, oldUserData = {}) {
-  const res = Api.put(`/users/${userId}`, { ...oldUserData, ...newUserData }, { headers: { authorization: 'Bearer ' + token } }).catch(_ => null)
+  const res = Api.put(`/users/${userId}`, { ...oldUserData, ...newUserData }).catch(_ => null)
   return res
 }

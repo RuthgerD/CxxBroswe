@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { getStandards, authenticateUser, getUserDetails, getPageHtml, getAvailablePages, createDiff, getCPPPulls, getCPPDiff, putUser, getDiff } from '@/Api'
+import { getStandards, authenticateUser, getUserDetails, deleteUserAccount, getSettings, patchSettings, getPageHtml, getAvailablePages, createDiff, getCPPPulls, getCPPDiff, putUser, getDiff } from '@/Api'
 
 import Vuex from 'vuex'
 
@@ -11,10 +11,12 @@ const gotoRe = /(?<=<[^>]*? [^>]*?)(?<full_href>href=["'](?:#(?<goto>.*?))["'])(
 export const store = new Vuex.Store({
   state: {
     isNavOpen: true,
+    showErrorModal: false,
     token: localStorage.getItem('auth_token') || null,
     userId: localStorage.getItem('user_id') || null,
     currentUser: null,
     hasValidToken: false,
+    controlView: 'main',
     standards: [],
     patch_type: null,
     githubPulls: {
@@ -38,6 +40,7 @@ export const store = new Vuex.Store({
       hash: null,
       fetching: false
     },
+    settings: null,
     pendingDiffs: [],
     selectedProfileDiffs: []
   },
@@ -56,30 +59,85 @@ export const store = new Vuex.Store({
     },
     toggleNav(state) {
       state.isNavOpen = !state.isNavOpen
+    },
+    showNetworkError(state, show) {
+      state.showErrorModal = show
+    },
+    toggleControlView(state, alternative) {
+      if (state.controlView === alternative) {
+        state.controlView = 'main'
+      } else {
+        state.controlView = alternative
+      }
     }
   },
   actions: {
     async getUserDetails(context) {
       context.state.hasValidToken = false
       if (!context.state.token || !context.state.userId) { return }
-
       const res = await getUserDetails(context.state.token, context.state.userId)
-
       if (res) {
         context.state.hasValidToken = true
         const wait = []
         for (const diffId of res.diffs) {
-          wait.push(getDiff(diffId))
+          const diff = await getDiff(diffId)
+          if (diff) {
+            wait.push()
+          } else {
+            context.state.showErrorModal = true
+          }
         }
+        context.state.currentUser = res
+        const r = await getSettings(context.state.token, context.state.currentUser.settings)
+        if (!r) context.state.showErrorModal = true
+        context.state.settings = r
         const diffs = await Promise.all(wait)
         res.diffs = diffs.filter(el => el !== null)
-        context.state.currentUser = res
+      } else {
+        context.state.showErrorModal = true
       }
     },
 
     logout(context) {
-      context.commit('setToken', null)
+      context.commit('destroyToken')
+      context.commit('setUserId', null)
       context.dispatch('getUserDetails')
+      context.state.controlView = 'main'
+    },
+    async deleteAccount(context) {
+      if (confirm('Do you really want to delete your account?\nThis is NOT reversible!')) {
+        const res = await deleteUserAccount(context.state.token, context.state.userId)
+        if (res) {
+          context.dispatch('logout')
+        } else {
+          context.state.showErrorModal = true
+        }
+      }
+    },
+    async saveSettings(context) {
+      const settingsPatch = { sections: { } }
+      const oldSettings = await getSettings(context.state.token, context.state.currentUser.settings)
+      if (!oldSettings) { context.state.showErrorModal = true; return }
+      for (const sectionKey in context.state.settings.sections) {
+        if (oldSettings.sections[sectionKey]) {
+          const newSection = context.state.settings.sections[sectionKey]
+          for (const newSettingKey in newSection.settings) {
+            const newSetting = newSection.settings[newSettingKey]
+            const oldSetting = oldSettings.sections[sectionKey].settings.find(el => el.id === newSection.settings[newSettingKey].id)
+            if ((!oldSetting) || (oldSetting && (newSetting.value !== oldSetting.value))) {
+              if (!settingsPatch.sections[sectionKey]) {
+                settingsPatch.sections[sectionKey] = { settings: [] }
+              }
+              settingsPatch.sections[sectionKey].settings.push(newSetting)
+            }
+          }
+        } else {
+          settingsPatch.sections.push(context.state.settings.sections[sectionKey])
+        }
+      }
+      const res = await patchSettings(context.state.token, context.state.settings._id, settingsPatch)
+      if (!res) context.state.showErrorModal = true
+      context.state.settings = res
     },
 
     fetchAll(context) {
@@ -90,14 +148,16 @@ export const store = new Vuex.Store({
 
     async authenticateUser(context, provider) {
       const res = await authenticateUser(provider)
-      if (!res) { return }
+      if (!res) { context.state.showErrorModal = true; return }
       context.commit('setToken', res.access_token)
       context.commit('setUserId', res.userId)
       context.dispatch('getUserDetails')
     },
 
     async fetchStandards(context) {
-      context.state.standards = await getStandards()
+      const standards = await getStandards()
+      if (!standards) context.state.showErrorModal = true
+      context.state.standards = standards
     },
 
     async fetchHtml(context, hash = null) {
@@ -140,6 +200,8 @@ export const store = new Vuex.Store({
                 context.state.currentUser.diffs.push(newDiffId)
               }
               context.state.stdHtmlDetails.diffs.push(newDiffId)
+            } else {
+              context.state.showErrorModal = true
             }
           }
           if (newDiff) { await context.dispatch('syncUser') }
@@ -149,7 +211,11 @@ export const store = new Vuex.Store({
             const patchData = await getCPPDiff(el.number)
             if (!patchData) { continue }
             const newDiffId = await createDiff(null, patchData, el.title)
-            if (newDiffId) { context.state.stdHtmlDetails.diffs.push(newDiffId) }
+            if (newDiffId) {
+              context.state.stdHtmlDetails.diffs.push(newDiffId)
+            } else {
+              context.state.showErrorModal = true
+            }
           }
           break
         case 'proposal':
@@ -188,7 +254,11 @@ export const store = new Vuex.Store({
 
     async syncUser(context) {
       const res = await putUser(context.state.token, context.state.userId, context.state.currentUser)
-      if (res) { await context.dispatch('getUserDetails') }
+      if (res) {
+        await context.dispatch('getUserDetails')
+      } else {
+        context.state.showErrorModal = true
+      }
     }
   },
   getters: {

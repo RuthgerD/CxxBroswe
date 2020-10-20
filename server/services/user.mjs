@@ -20,6 +20,10 @@ export default class UserService extends default_metaservice(User) {
             delete (res.passhash = undefined);
         return res;
     }
+    static async remove(id, proj) {
+        const res = await super.remove(id, proj);
+        return res;
+    }
     static async getByExternalId(id, provider, proj) {
         const cond = {source: provider, external_id: id};
         const res = await this.one(cond, proj);
