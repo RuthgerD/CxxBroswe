@@ -27,10 +27,10 @@ export const listPages = async (std, diffs) => {
 
 export const getPage = async (page, std, diffs) => {
     let dir_path;
-    if(std)
+    if(std.length >= 8)
         dir_path = `./.managed/cache/std/${std}`;
     else
-        dir_path = operations.path_for('cdf68b3335a02a820273f53a9fa0cbb45c31016c', diffs);
+        dir_path = operations.path_for(std, diffs);
 
     if(!existsSync(dir_path))
         throw Error("Build does not exist");
