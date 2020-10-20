@@ -42,8 +42,11 @@ export default {
     Settings
   },
   computed: {
-    ...mapState(['hasValidToken', 'controlView', 'showErrorModal'
-    ])
+    ...mapState(['hasValidToken', 'controlView']),
+    showErrorModal: {
+      get() { return this.$store.state.showErrorModal },
+      set(value) { this.$store.state.showErrorModal = value }
+    }
   }
 }
 </script>
