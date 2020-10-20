@@ -6,7 +6,7 @@
           v-for="element in data"
           :key="data.indexOf(element)"
           :class="{
-            selected: value.find((cm) => compare(cm, element)),
+            selected: selected.find((cm) => compare(cm, element)),
             disabled,
           }"
           @click="selectElement(element)"
@@ -34,6 +34,11 @@ export default {
     data: { default: () => [] },
     on: { default: null }
   },
+  computed: {
+    selected() {
+      return Array.isArray(this.value) ? this.value : (this.value ? [this.value] : [])
+    }
+  },
   methods: {
     compare(a, b) {
       if (this.on) { return a[this.on] === b[this.on] }
@@ -42,11 +47,13 @@ export default {
     selectElement(el) {
       if (!this.disabled) {
         let copy = this.value
-        if (copy.find((cm) => this.compare(cm, el))) {
-          copy = copy.filter((cm) => !this.compare(cm, el))
-        } else {
-          copy.push(el)
-        }
+        if (Array.isArray(copy)) {
+          if (copy.find((cm) => this.compare(cm, el))) {
+            copy = copy.filter((cm) => !this.compare(cm, el))
+          } else {
+            copy.push(el)
+          }
+        } else { copy = el }
         this.$emit('input', copy)
       }
     }

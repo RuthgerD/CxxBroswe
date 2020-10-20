@@ -27,7 +27,7 @@
 <script>
 import { mapState } from 'vuex'
 import Control from '@/components/Control'
-import StdView from '@/components/StdView'
+import StdView from '@/components/StdView/StdView'
 import MenuBar from '@/components/menu/MenuBar'
 import MenuIcon from '@/components/menu/MenuIcon'
 import Settings from '@/components/settings/Settings.vue'

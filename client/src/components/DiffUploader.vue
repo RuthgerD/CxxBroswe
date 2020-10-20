@@ -2,7 +2,6 @@
   <div>
     <b-form-file
       multiple
-      v-model="fileList"
       @input="onNewFiles"
       placeholder="Choose a file or drop it here..."
       :file-name-formatter="(_) => 'Choose a file or drop it here...'"
@@ -11,8 +10,15 @@
     >
     </b-form-file>
     <erasable-list
-      v-model="$store.state.pendingDiffs"
-      @input="onNewFiles"
+      v-model="mappedFiles"
+      @input="
+        (files) => {
+          fileList = fileList.filter(
+            (el) => files.filter((e) => el.name === e.name).length > 0
+          )
+          onNewFiles([])
+        }
+      "
       :formatter="(el) => el.name"
       :disabled="disabled"
     />
@@ -23,7 +29,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import ErasableList from './ErasableList'
 
 export default {
@@ -32,14 +37,14 @@ export default {
     ErasableList
   },
   props: {
-    disabled: { default: false }
+    disabled: { default: false },
+    maxFiles: { default: null }
   },
   data() {
-    return { fileList: [], error: false }
+    return { fileList: [], error: false, mappedFiles: [] }
   },
   methods: {
     onNewFiles(files) {
-      this.error = false
       const filtered = files.filter(
         (el) => el.type && el.size < 5 * Math.pow(10, 6) && el.name
       )
@@ -51,17 +56,23 @@ export default {
         }`
       }
 
-      this.fileList = filtered
-      this.$store.state.pendingDiffs = this.$store.state.pendingDiffs.concat(
-        filtered.map((el) => ({
-          name: el.name,
-          data: el.text()
-        }))
-      )
+      const dedup = (arr) =>
+        arr.filter((el, i) => arr.findIndex((e, j) => e.name === el.name) === i)
+
+      this.fileList = dedup(this.fileList.concat(filtered))
+      if (this.maxFiles) {
+        if (this.maxFiles < this.fileList.length) {
+          this.error = `* File limit is ${this.maxFiles}`
+        }
+        this.fileList = this.fileList.slice(0, this.maxFiles)
+      }
+      this.mappedFiles = this.fileList.map((el) => ({
+        name: el.name,
+        data: el.text()
+      }))
+
+      this.$emit('data', this.mappedFiles)
     }
-  },
-  computed: {
-    ...mapState(['pendingDiffs'])
   }
 }
 </script>
