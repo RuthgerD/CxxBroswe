@@ -1,0 +1,481 @@
+@media only screen and (max-width:2000px) and (min-width:1600px) {
+  .html-holder {
+      padding-left: 200px
+  }
+}
+
+@media only screen and (max-width:1600px) and (min-width:1400px) {
+  .html-holder {
+      padding-left: 400px
+  }
+}
+
+* {
+  hyphens: auto!important
+}
+
+h1,h2,h3,h4 {
+  line-height: 1;
+  margin: 10pt 5pt
+}
+
+h1 {
+  font-size: 2em!important
+}
+
+h2,h3,h4 {
+  border-bottom: 1px dashed rgba(0,0,0,.2)
+}
+
+h2 {
+  font-size: 1.5em!important
+}
+
+h3,h4 {
+  font-size: 1em!important
+}
+
+.secnum {
+  color: #000!important
+}
+
+.texttt {
+  font-size: .8em!important
+}
+
+.codeblock,.itemdeclcode,.texttt {
+  background-color: var(--light);
+  border-radius: 4px
+}
+
+.tocHeader {
+  text-align: center
+}
+
+.tocChapter {
+  display: none
+}
+
+.example,div.note {
+  font-size: .8em
+}
+
+.texpara,li {
+  margin-top: 3pt;
+  margin-bottom: 3pt
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 9mm
+}
+
+ol,ul {
+  margin-top: 0;
+  margin-bottom: 0
+}
+
+a {
+  text-decoration: none!important
+}
+
+.hidden_link {
+  text-decoration: none;
+  color: inherit
+}
+
+ul>li:before {
+  content: "\2014";
+  position: absolute;
+  margin-left: -1.5em
+}
+
+.shy:before {
+  content: "\00ad"
+}
+
+.abbr_ref,.folded_abbr_ref {
+  float: right
+}
+
+.unfolded_abbr_ref {
+  display: none
+}
+
+.secnum {
+  display: inline-block;
+  min-width: 35pt
+}
+
+.annexnum {
+  display: block
+}
+
+.sourceLinkParent {
+  float: right
+}
+
+.itemDeclLink,.sourceLink {
+  position: absolute;
+  opacity: 0
+}
+
+.sourceLink {
+  margin-left: 10pt
+}
+
+.itemDeclLink:hover,.sourceLink:hover {
+  opacity: 1
+}
+
+.itemDeclLink {
+  font-size: 75%;
+  text-align: right;
+  width: 5em
+}
+
+.marginalizedparent {
+  position: relative;
+  left: -18mm;
+  top: .6mm
+}
+
+.footnoteNumberParent {
+  position: relative;
+  left: -4.7em
+}
+
+.marginalized {
+  width: 15mm;
+  position: absolute;
+  font-size: 7pt;
+  text-align: right
+}
+
+.enumerated_item_num {
+  display: block;
+  margin-top: 3pt;
+  margin-bottom: 3pt;
+  margin-right: 6pt
+}
+
+.para,.section {
+  text-align: justify
+}
+
+.para {
+  margin-bottom: 6pt;
+  margin-top: 6pt;
+  min-height: 1.2em
+}
+
+.section {
+  margin-top: 1em
+}
+
+.sentence {
+  display: inline
+}
+
+.index {
+  position: relative;
+  float: right;
+  right: -1em;
+  display: none
+}
+
+.index:before {
+  position: absolute;
+  content: "⟵";
+  background-color: #c9fbc9
+}
+
+.indexitems {
+  margin-left: 2em;
+  text-indent: -2em
+}
+
+.itemdescr {
+  margin-left: 12mm
+}
+
+.bnf {
+  text-indent: -3em;
+  padding-left: 3em
+}
+
+.bnf span.texttt,.ncbnf span.texttt {
+  font-size: 9pt
+}
+
+.bnf,.ncbnf {
+  font-size: 14px;
+  font-style: italic;
+  margin-top: .5em;
+  margin-bottom: .5em;
+  margin-left: 30pt;
+  line-height: 1.4
+}
+
+.ncbnf,.ncrebnf {
+  text-indent: -3em;
+  padding-left: 3em
+}
+
+.ncrebnf,.ncsimplebnf {
+  font-style: italic;
+  margin-top: .5em;
+  margin-bottom: .5em;
+  margin-left: 30pt;
+  line-height: 1.4
+}
+
+.textnormal {
+  font-size: 12pt;
+  white-space: normal
+}
+
+.bnf span.textnormal,.ncbnf span.textnormal {
+  font-size: .95em;
+  white-space: normal
+}
+
+p {
+  margin-top: 4pt;
+  margin-bottom: 4pt
+}
+
+.rlap {
+  display: inline-block;
+  width: 0
+}
+
+.noncxxterminal,.terminal {
+  font-size: 9pt
+}
+
+.ncrebnf a.nontermdef,.term {
+  font-style: italic
+}
+
+.textbf {
+  font-weight: 700
+}
+
+.textsf {
+  font-size: 15px
+}
+
+.footnote span.textsf {
+  font-size: 11px
+}
+
+.bnf span.textsf,.example span.textsf,.ncbnf span.textsf {
+  font-size: 14px
+}
+
+.textsc {
+  font-variant: small-caps
+}
+
+.nontermdef {
+  font-size: 15px
+}
+
+.emph,.mathit,.nontermdef,.techterm,.textsl {
+  font-style: italic
+}
+
+.ungap {
+  display: inline-block;
+  width: 2pt
+}
+
+.tcode_in_codeblock {
+  font-size: 10pt
+}
+
+.footnote span.texttt {
+  font-size: 11px
+}
+
+.phantom {
+  color: #fff
+}
+
+.mathblock {
+  display: block;
+  margin: 1.2em auto;
+  text-align: center
+}
+
+.mathalpha {
+  font-style: italic
+}
+
+.synopsis {
+  margin-top: .5em
+}
+
+.definition,.synopsis {
+  font-weight: 700;
+  display: block
+}
+
+.codeblock {
+  line-height: 140%;
+  white-space: pre;
+  display: block;
+  margin: .5em 0;
+  padding-left: 2em
+}
+
+.outputblock {
+  margin-left: 1.2em;
+  line-height: 145%
+}
+
+.itemdecl {
+  margin-top: 2ex
+}
+
+.itemdeclcode {
+  white-space: pre;
+  font-size: 10pt;
+  display: block;
+  overflow: auto;
+  margin-right: -15mm
+}
+
+.comment,.footnote .comment {
+  color: green;
+  font-style: italic;
+  font-size: 12pt
+}
+
+.footnote .comment {
+  font-size: 13px
+}
+
+.example .comment,.note .comment {
+  color: green;
+  font-style: italic;
+  font-size: .95em
+}
+
+.keyword {
+  color: #00607c
+}
+
+.curlybracket,.parenthesis,.squarebracket {
+  color: #af1915
+}
+
+.literal,.literalterminal {
+  color: #9f6807
+}
+
+.anglebracket,.operator {
+  color: #570057
+}
+
+.preprocessordirective {
+  color: #6f4e37
+}
+
+.footnotenum,.textsuperscript {
+  vertical-align: super;
+  font-size: smaller;
+  line-height: 0
+}
+
+.footnote {
+  font-size: 13px;
+  margin: .6em 2em
+}
+
+.minipage {
+  display: inline-block;
+  margin-right: 3em
+}
+
+.figure,.numberedTable {
+  text-align: center;
+  margin: 1em
+}
+
+table {
+  border: 1px solid #000;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: .7em
+}
+
+td,th {
+  padding-left: 1em;
+  padding-right: 1em
+}
+
+.empty {
+  padding: 0 0 0 1px
+}
+
+.left {
+  text-align: left
+}
+
+.hidden {
+  padding: 0;
+  width: 0
+}
+
+.border {
+  border-left: 1px solid #000
+}
+
+.cline,.rowsep {
+  border-top: 1px solid #000
+}
+
+.capsep {
+  border-top: 3px solid #000;
+  border-top-style: double
+}
+
+th {
+  border-bottom: 1px solid #000
+}
+
+.centry {
+  font-weight: 700
+}
+
+.table {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  width: 90%
+}
+
+.indented {
+  background: inherit;
+  display: block;
+  margin-left: 2em;
+  margin-bottom: 1em;
+  margin-top: 1em
+}
+
+.enumerate {
+  border: 0;
+  margin: 0
+}
+
+.enumerate td {
+  padding: 0
+}
+
+.enumerate td:first-child {
+  width: 1cm;
+  text-align: right
+}

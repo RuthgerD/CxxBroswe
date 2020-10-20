@@ -43,8 +43,12 @@ export function getDiff(id) {
   return defaultGet(`/diffs/${id}`, null)
 }
 
-export async function getAvailablePages(base, diffs, maxLoops = 100, timeout = 4000) {
-  const isAvailable = async () => Api.get('/pages', { params: { base, diffs } }).catch(_ => null)
+export function getProposals() {
+  return defaultGet('/proposals', null)
+}
+
+export async function getAvailablePages(std, diffs, maxLoops = 100, timeout = 4000) {
+  const isAvailable = async () => Api.get('/pages', { params: { std, diffs } }).catch(_ => null)
 
   for (let i = 0; i < maxLoops; ++i) {
     const res = await isAvailable()
@@ -55,8 +59,8 @@ export async function getAvailablePages(base, diffs, maxLoops = 100, timeout = 4
   }
 }
 
-export function getPageHtml(base, diffs, page) {
-  return defaultGet(`/pages/${page}`, null, { params: { base, diffs } })
+export function getPageHtml(std, diffs, page) {
+  return defaultGet(`/pages/${page}`, null, { params: { std, diffs } })
 }
 
 export function authenticateUser(provider) {
@@ -94,6 +98,9 @@ export async function getCPPDiff(number) {
 }
 
 export async function putUser(token, userId, newUserData, oldUserData = {}) {
-  const res = Api.put(`/users/${userId}`, { ...oldUserData, ...newUserData }).catch(_ => null)
-  return res
+  return Api.put(`/users/${userId}`, { ...oldUserData, ...newUserData }, { headers: { authorization: 'Bearer ' + token } }).catch(_ => null)
+}
+
+export async function postProposal(token, userId, proposal) {
+  return defaultPost(`/users/${userId}/proposals`, proposal, { headers: { authorization: 'Bearer ' + token } }).catch(_ => null)
 }

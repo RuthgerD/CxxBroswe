@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { getStandards, authenticateUser, getUserDetails, deleteUserAccount, getSettings, patchSettings, getPageHtml, getAvailablePages, createDiff, getCPPPulls, getCPPDiff, putUser, getDiff } from '@/Api'
+import { getStandards, authenticateUser, getUserDetails, deleteUserAccount, getSettings, patchSettings, getPageHtml, getAvailablePages, createDiff, getCPPPulls, getCPPDiff, putUser, getDiff, getProposals, postProposal } from '@/Api'
 
 import Vuex from 'vuex'
 
@@ -7,6 +7,8 @@ Vue.use(Vuex)
 
 const linkRe = /(?<=<[^>]*? [^>]*?)(?<full_href>href=["'](?<page>[^"']+)\.html(?:#(?<goto>.*?)|(?:.*?))["'])(?=[^>]*>)/gm
 const gotoRe = /(?<=<[^>]*? [^>]*?)(?<full_href>href=["'](?:#(?<goto>.*?))["'])(?=[^>]*>)/gm
+const bodyRe = /(?:.*<body>)(?<core>.*)(?=<\/body>)/ms
+const hrefTabRe = /(href=["'].*?["'])/gm
 
 export const store = new Vuex.Store({
   state: {
@@ -18,12 +20,13 @@ export const store = new Vuex.Store({
     hasValidToken: false,
     controlView: 'main',
     standards: [],
+    proposals: [],
     patch_type: null,
     githubPulls: {
       page: 1,
       amount: 5,
       data: [],
-      selected: [],
+      selected: null,
       fetching: false
     },
     stdHtmlDetails: {
@@ -42,7 +45,8 @@ export const store = new Vuex.Store({
     },
     settings: null,
     pendingDiffs: [],
-    selectedProfileDiffs: []
+    selectedProfileDiffs: [],
+    selectedProposal: null
   },
   mutations: {
     setToken(state, token) {
@@ -82,7 +86,7 @@ export const store = new Vuex.Store({
         for (const diffId of res.diffs) {
           const diff = await getDiff(diffId)
           if (diff) {
-            wait.push()
+            wait.push(diff)
           } else {
             context.state.showErrorModal = true
           }
@@ -115,7 +119,7 @@ export const store = new Vuex.Store({
       }
     },
     async saveSettings(context) {
-      const settingsPatch = { sections: { } }
+      const settingsPatch = { sections: {} }
       const oldSettings = await getSettings(context.state.token, context.state.currentUser.settings)
       if (!oldSettings) { context.state.showErrorModal = true; return }
       for (const sectionKey in context.state.settings.sections) {
@@ -144,6 +148,7 @@ export const store = new Vuex.Store({
       context.dispatch('getUserDetails')
       context.dispatch('fetchStandards')
       context.dispatch('fetchCPPPulls')
+      context.dispatch('fetchProposals')
     },
 
     async authenticateUser(context, provider) {
@@ -156,8 +161,23 @@ export const store = new Vuex.Store({
 
     async fetchStandards(context) {
       const standards = await getStandards()
-      if (!standards) context.state.showErrorModal = true
+      if (!standards) { context.state.showErrorModal = true }
       context.state.standards = standards
+      context.state.stdHtmlDetails.base = context.state.standards[0].aliasof.hash
+    },
+
+    async fetchProposals(context) {
+      context.state.proposals = await getProposals() || []
+    },
+
+    async createProposal(context, options) {
+      console.log(options)
+      const ndiff = await createDiff(context.state.userId, await options.diff.data, options.diff.name)
+      if (ndiff && await postProposal(context.state.token, context.state.userId, { ...options, versions: [ndiff] })) {
+        context.dispatch('fetchProposals')
+      } else {
+        context.state.showErrorModal = true
+      }
     },
 
     async fetchHtml(context, hash = null) {
@@ -169,10 +189,12 @@ export const store = new Vuex.Store({
       context.state.stdHtml.err_src = !res ? 'Could not find page' : null
 
       if (res) {
-        const linkPass = await res.replaceAll(linkRe, 'cxx-page="$2" cxx-goto="$3" style="cursor: pointer;" class="cxx-test" title="$2 #$3"')
+        const headerPass = await res.replace(bodyRe, '$1')
+        const linkPass = await headerPass.replaceAll(linkRe, 'cxx-page="$2" cxx-goto="$3" style="cursor: pointer;" class="cxx-test" title="$2 #$3"')
         const gotoPass = await linkPass.replaceAll(gotoRe, 'cxx-goto="$2" style="cursor: pointer;" class="cxx-test" title="#$2"')
+        const hrefTabPass = await gotoPass.replaceAll(hrefTabRe, 'target="_blank" rel="noopener noreferrer" $1')
 
-        context.state.stdHtml.src = gotoPass
+        context.state.stdHtml.src = hrefTabPass
         context.state.stdHtml.hash = hash
       } else { context.state.stdHtml.src = '' }
     },
@@ -206,17 +228,15 @@ export const store = new Vuex.Store({
           }
           if (newDiff) { await context.dispatch('syncUser') }
           break
-        case 'pr':
-          for (const el of context.state.githubPulls.selected) {
-            const patchData = await getCPPDiff(el.number)
-            if (!patchData) { continue }
-            const newDiffId = await createDiff(null, patchData, el.title)
-            if (newDiffId) {
-              context.state.stdHtmlDetails.diffs.push(newDiffId)
-            } else {
-              context.state.showErrorModal = true
-            }
+        case 'pr': {
+          const el = context.state.githubPulls.selected
+          const patchData = await getCPPDiff(el.number)
+          if (!patchData) { break }
+          const newDiffId = await createDiff(null, patchData, el.title)
+          if (newDiffId) { context.state.stdHtmlDetails.diffs.push(newDiffId) } else {
+            context.state.showErrorModal = true
           }
+        }
           break
         case 'proposal':
           break
@@ -264,7 +284,7 @@ export const store = new Vuex.Store({
   getters: {
     standardValName: state => state.standards.filter(val => val.aliasof && val.aliasof.hash).map(val => ({
       value: val.aliasof.hash,
-      text: `${val.cplusplus ? 'C++' + val.cplusplus : val.name}` // TODO: have nicer formatting
+      text: `C++ ${val.cplusplus || val.name}`
     })
     )
   }

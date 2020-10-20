@@ -23,7 +23,7 @@
       </span>
     </a>
     <div>
-      <b-button @click="$store.commit('toggleControlView', 'settings')" variant="outline-primary"><b-icon-gear-fill /></b-button>
+      <b-button @click="$store.commit('toggleControlView', 'settings')" variant="outline-primary" class="mt-2 mb-2"><b-icon-gear-fill /></b-button>
     </div>
   </div>
 </template>
