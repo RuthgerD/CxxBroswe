@@ -1,6 +1,9 @@
 {
   "name": "backend-frontend",
   "version": "0.1.0",
+  "engines": {
+    "node": "14.x"
+  },
   "description": "This collection package integrates the server and client for deployment.",
   "main": "server/app.js",
   "scripts": {

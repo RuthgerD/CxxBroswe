@@ -5,11 +5,7 @@ cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
     - server/node_modules/
-    - server/.managed/cache/
-    - server/.managed/draft/
-    - server/.managed/cxxdraft-htmlgen/
     - server/stack
-    - /root/.stack
 stages:
   - build
   - test
@@ -47,25 +43,5 @@ test:
     - ln -s /usr/lib/libcurl.so.4 /usr/lib/libcurl-gnutls.so.4
     - ln -s /usr/lib/libncursesw.so.6 /usr/lib/libtinfo.so.6
     - cd server
-    - ./stack config set system-ghc --global true
-    - npm run postinstall
+    - npm run prestart
     - npm run ci-test
-
-deploy:
-  stage: deploy
-  tags:
-    - docker
-  image: ruby:alpine
-  script:
-    - apk update && apk add git curl
-    - gem install dpl
-    - dpl --provider=heroku --app=$HEROKU_APP_NAME --api-key=$HEROKU_API_KEY
-  environment:
-    name: production
-    url: https://$HEROKU_APP_NAME.herokuapp.com/
-  only:
-    refs:
-      - master
-    variables:
-      - $HEROKU_APP_NAME
-      - $HEROKU_API_KEY
