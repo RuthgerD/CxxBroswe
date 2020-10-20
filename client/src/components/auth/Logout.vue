@@ -14,6 +14,10 @@ export default {
 
 <style>
   .logout-btn{
-    width: 16em !important;
+    width: 10em;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>

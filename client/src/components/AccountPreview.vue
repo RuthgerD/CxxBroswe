@@ -1,10 +1,9 @@
 <template>
-  <div class="profileViewBody">
+  <div class="profileViewBody" v-if="currentUser">
     <b-img
       v-if="currentUser.avatar_url!=null"
       width="48"
       height="48"
-      class="m-1"
       style="border: 1px solid var(--primary)"
       rounded="circle"
       alt="profile picture"
@@ -23,7 +22,9 @@
       <p v-else class="m-0" >{{ currentUser.login }}</p>
       </span>
     </a>
-      <b-button variant="outline-primary"><b-icon-gear-fill /></b-button>
+    <div>
+      <b-button @click="$store.commit('toggleControlView', 'settings')" variant="outline-primary"><b-icon-gear-fill /></b-button>
+    </div>
   </div>
 </template>
 

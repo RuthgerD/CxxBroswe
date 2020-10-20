@@ -15,6 +15,7 @@ export const User = model('User', {
     updated_at: { type: Date },
     source: { type: String, required: true },
 
+    settings: { type: ObjectId, ref: 'Settings' },
     diffs: [{ type: ObjectId, ref: 'Diff' }],
     proposals: [{ type: ObjectId, ref: 'Proposal' }]
 });
