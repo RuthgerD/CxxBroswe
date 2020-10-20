@@ -9,7 +9,7 @@
             <h6>{{ setting.name }}:</h6>
             <TextArea :setting='setting' v-if="setting.type=='textArea'"/>
             <Select :setting='setting' v-else-if="setting.type=='select'"/>
-            <RightJust v-else-if="setting.type=='colour'" style="position: absolute; transform: translate(-10%, -120%);" ><Colour :setting='setting' /></RightJust>
+            <Colour v-else-if="setting.type=='colour'" :setting='setting' />
             <hr />
         </div>
       </div>
@@ -40,7 +40,6 @@ import Splitdiv from '../Splitdiv.vue'
 import Colour from './item/Colour'
 import Select from './item/Select'
 import TextArea from './item/TextArea'
-import RightJust from '../RightJust'
 
 export default {
   name: 'settings',
@@ -51,8 +50,7 @@ export default {
     AccountPreview,
     Colour,
     Select,
-    TextArea,
-    RightJust
+    TextArea
   },
   computed: {
     ...mapState(['hasValidToken', 'controlView', 'settings'])
