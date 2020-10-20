@@ -86,7 +86,7 @@ export const store = new Vuex.Store({
         for (const diffId of res.diffs) {
           const diff = await getDiff(diffId)
           if (diff) {
-            wait.push()
+            wait.push(diff)
           } else {
             context.state.showErrorModal = true
           }
