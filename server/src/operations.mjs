@@ -110,23 +110,17 @@ agenda.define('gen-cdhg', async job => {
     try {
         await spawn('git', ['reset', base], {cwd: '.managed/draft'});
 
-        let gen_sha;
-        //TODO replace by lookup in StandardService
-        switch (base) {
-            case 'c19ff8763500ac0f576b80c46e120d286ca5e8d5':
-                gen_sha = 'f197e366e044b4c07e2cc711a5b18b71ce4f73b5';
-                break;
-            case 'be5fa97a402d817518b6ce8d0451874f289761c0':
-                gen_sha = '27d1ecca36e68b75c7b31552458eddcbf7a6f14e';
-                break;
-            default:
-                throw new Error('Unsupported base commit');
-        }
+        const commit = await DraftCommitService.one({hash: base}, '_id');
+        if(!commit)
+            throw new Error('Unknown base commit' + base);
+        const res = await StandardService.one({aliasof: commit._id}, 'gen_sha');
+        if(!res || !res.gen_sha)
+            throw new Error('Unsupported base commit' + base);
 
         for (const diff of diffs)
             await spawn('git', ['patch', '-'], {cwd: '.managed/draft', input: await DiffService.get(diff)});
 
-        await gen_to(path, gen_sha);
+        await gen_to(path, res.gen_sha);
     } catch (err) {
         console.log(err);
         await touch(`${path}-FAILED`);
