@@ -44,7 +44,7 @@ export default function(Service){
             return res.status(200).json(obj);
         }
         static async update(req, res) {
-            const obj = await Service.update(req.params.id, req.body);
+            const obj = await Service.update(req.params.id, req.body, req.method === 'PATCH');
             if(!obj)
                 return res.status(404).json({message: 'Object does not exist'});
             return res.status(200).json(obj);

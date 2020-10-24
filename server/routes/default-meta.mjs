@@ -29,6 +29,7 @@ export default function(Controller) {
 
     router.get('/:id', Controller.get);
     router.put('/:id', Controller.update);
+    router.patch('/:id', Controller.update);
     router.delete('/:id', Controller.remove);
 
 

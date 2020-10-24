@@ -1,4 +1,5 @@
 'use strict';
+import Object from '../src/object-flatten.mjs';
 import mongoose from 'mongoose';
 const { Types } = mongoose;
 
@@ -18,7 +19,7 @@ export default function(Model) {
                 return null;
             return await obj.save();
         }
-        static async list(cond, proj, population, options) {
+        static async list(cond, proj = '', population = [], options = undefined) {
             const query = Model.find(cond, proj, options);
             populate(query, population);
             return await query.exec();
@@ -35,9 +36,11 @@ export default function(Model) {
             populate(query, population);
             return await query.exec();
         }
-        static async update(id, content) {
+        static async update(id, content, partial) {
             if(!Types.ObjectId.isValid(id))
                 return null;
+            if(partial)
+                content = { $set: Object.flatten(content, [], '.$.') };
             return await Model.findByIdAndUpdate(id, content, {'new': true}).exec();
         }
         static async remove(id) {
