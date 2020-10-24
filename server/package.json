@@ -37,7 +37,7 @@
     "mathjax-node-cli": "^1.0.1",
     "mongoose": "^5.10.0",
     "morgan": "^1.10.0",
-    "nodegit": "^0.27.0",
+    "promisify-child-process": "^4.1.1",
     "requestify": "^0.2.5",
     "split": "^1.0.1",
     "touch": "^3.1.0"
