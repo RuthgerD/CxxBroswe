@@ -475,40 +475,6 @@
 					"response": []
 				},
 				{
-					"name": "Add proposal version",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b4fcaf54-6669-4ed1-860a-47e193660504",
-								"exec": [
-									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"url": {
-							"raw": "{{host}}/api/proposals/{{proposal_id}}/add_version/{{diff_id}}",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"proposals",
-								"{{proposal_id}}",
-								"add_version",
-								"{{diff_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Retrieve Proposal",
 					"event": [
 						{
