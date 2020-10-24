@@ -66,7 +66,7 @@ export const build_eelis_gen = async (gen_sha) => {
     execSync(`${stack_path} config set system-ghc --global true`);
     await sleep(7000);
     execFileSync(`${process.cwd()}/stack`,
-        ['build', '--copy-bins', '--local-bin-path', out_path, './'],
+        ['build', '--skip-ghc-check', '--copy-bins', '--local-bin-path', out_path, './'],
         {cwd: '.managed/cxxdraft-htmlgen', stdio: 'inherit'});
     console.log('Done.');
     return out_path + '/cxxdraft-htmlgen';
@@ -77,7 +77,7 @@ const invoke_eelis_gen = async (location) => {
     env.PATH += `:${process.cwd()}/node_modules/mathjax-node-cli/bin/`;
     console.log('CWD: ', process.cwd());
     await execFile(location,
-        ['../draft'],
+        ['--skip-ghc-check', '../draft'],
         {cwd: './.managed/cxxdraft-htmlgen', env, stdio: 'inherit'});
 };
 
