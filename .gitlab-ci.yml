@@ -43,5 +43,7 @@ test:
     - ln -s /usr/lib/libcurl.so.4 /usr/lib/libcurl-gnutls.so.4
     - ln -s /usr/lib/libncursesw.so.6 /usr/lib/libtinfo.so.6
     - cd server
+    - test -d node_modules/nodegit || BUILD_ONLY=true npm install -s nodegit
+    - npm install --unsafe-perm
     - npm run prestart
     - npm run ci-test
