@@ -756,7 +756,7 @@
 								"exec": [
 									"pm.test(\"Status\", () => pm.response.to.have.status(201))",
 									"",
-									"pm.environment.set(\"test_id\", pm.response.json())"
+									"pm.environment.set(\"settings_id\", pm.response.json())"
 								],
 								"type": "text/javascript"
 							}
