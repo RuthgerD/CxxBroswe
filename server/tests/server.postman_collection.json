@@ -795,8 +795,7 @@
 									"    const body = pm.response.json();",
 									"    pm.expect(body).to.be.an(\"object\");",
 									"    pm.expect(body.sections).to.be.an(\"object\");",
-									"})",
-									"console.log(pm.response.json())"
+									"})"
 								],
 								"type": "text/javascript"
 							}
