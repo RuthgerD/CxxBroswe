@@ -84,12 +84,6 @@ a {
   color: inherit
 }
 
-ul>li:before {
-  content: "\2014";
-  position: absolute;
-  margin-left: -1.5em
-}
-
 .shy:before {
   content: "\00ad"
 }

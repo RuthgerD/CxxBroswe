@@ -183,7 +183,7 @@ export const store = new Vuex.Store({
     async fetchHtml(context, hash = null) {
       const res = await getPageHtml(
         context.state.stdHtmlDetails.base,
-        context.state.stdHtmlDetails.diffs,
+        context.state.stdHtmlDetails.diffs.concat(context.state.selectedProfileDiffs.map(el => el._id)),
         context.state.stdHtmlDetails.page || 'index'
       )
       context.state.stdHtml.err_src = !res ? 'Could not find page' : null
