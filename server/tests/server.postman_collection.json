@@ -790,15 +790,13 @@
 							"script": {
 								"id": "29104cae-d3d0-43b8-bef1-37127bec3597",
 								"exec": [
-									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
-									"",
-									"pm.test(\"Correct body format\", () => pm.response.to.have.jsonSchema({",
-									"    \"type\": \"object\",",
-									"    \"properties\": {",
-									"        \"sections\": { \"type\": \"Object\" },",
-									"    },",
-									"    \"required\": [\"properties\"]",
-									"}))"
+									"pm.test(\"Status\", () => pm.response.to.have.status(200));",
+									"pm.test(\"Valid body\", () => {",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.be.an(\"object\");",
+									"    pm.expect(body.sections).to.be.an(\"object\");",
+									"})",
+									"console.log(pm.response.json())"
 								],
 								"type": "text/javascript"
 							}
