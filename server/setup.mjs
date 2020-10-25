@@ -1,7 +1,6 @@
 "use strict";
 import { execFileSync, execSync } from 'child_process';
 import { promises as fs, existsSync } from 'fs';
-import Git from 'nodegit';
 import { force_override_resolver, build_eelis_gen } from './src/operations.mjs'
 
 function invoke(command) {
@@ -23,16 +22,16 @@ const mkdir_if_not_exists = async (path) => {
 
     console.log('Cloning draft...');
     if(!existsSync('.managed/draft'))
-        await Git.Clone.clone('https://github.com/cplusplus/draft', '.managed/draft');
+        invoke('git clone https://github.com/cplusplus/draft .managed/draft');
     else
-        await Git.Repository.open(`.managed/draft`).then(repo => repo.fetch('origin'));
+        invoke('cd .managed/draft; git fetch; cd -')
     console.log('Done.');
 
     console.log('Cloning cxxdraft-htmlgen...');
     if(!existsSync('.managed/cxxdraft-htmlgen'))
-        await Git.Clone.clone('https://github.com/Eelis/cxxdraft-htmlgen', '.managed/cxxdraft-htmlgen');
+        invoke('git clone https://github.com/Eelis/cxxdraft-htmlgen .managed/cxxdraft-htmlgen');
     else
-        await Git.Repository.open(`.managed/cxxdraft-htmlgen`).then(repo => repo.fetch('origin'));
+        invoke('cd .managed/cxxdraft-htmlgen; git fetch; cd -')
     console.log('Done.');
     await mkdir_if_not_exists('.managed/cxxdraft-htmlgen/.versions');
 

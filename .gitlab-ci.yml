@@ -1,4 +1,4 @@
-image: node:14-alpine
+image: alpine:edge
 
 # Cache modules in between jobs per-branch
 cache:
@@ -21,12 +21,8 @@ build:
   variables:
     MONGODB_URI: "mongodb://mongo:27017/serverTestDB"
   script:
-    - apk add -q ghc python tzdata pkgconfig build-base libgit2-dev krb5-dev pcre curl
-    - ghc --version
-    - ln -s /usr/lib/libcurl.so.4 /usr/lib/libcurl-gnutls.so.4
-    - ln -s /usr/lib/libncursesw.so.6 /usr/lib/libtinfo.so.6
+    - apk add -q nodejs-current-npm ghc build-base git curl graphviz
     - cd server
-    - test -d node_modules/nodegit || BUILD_ONLY=true npm install -s nodegit
     - npm install --unsafe-perm
 
 test:
@@ -39,11 +35,8 @@ test:
   variables:
     MONGODB_URI: "mongodb://mongo:27017/serverTestDB"
   script:
-    - apk --no-cache -q add git make ghc libgit2-dev krb5 pcre graphviz python tzdata pkgconfig build-base libgit2-dev krb5-dev curl
-    - ln -s /usr/lib/libcurl.so.4 /usr/lib/libcurl-gnutls.so.4
-    - ln -s /usr/lib/libncursesw.so.6 /usr/lib/libtinfo.so.6
+    - apk --no-cache -q add nodejs-current-npm ghc build-base git curl graphviz
     - cd server
-    - test -d node_modules/nodegit || BUILD_ONLY=true npm install -s nodegit
     - npm install --unsafe-perm
     - npm run prestart
     - npm run ci-test

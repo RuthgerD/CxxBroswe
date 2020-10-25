@@ -73,18 +73,6 @@ const app = express();
         res.json(1);
     });
 
-    app.patch('/api/proposals/:pid/add_version/:vid', async (req, res) => {
-        let proposal = await ProposalService.get(req.params.pid);
-        if (!proposal)
-            return res.status(404).json({ message: 'Object does not exist' });
-        if (!ObjectId.isValid(req.params.vid))
-            return res.status(400).json({ message: 'Invalid ID' });
-        proposal.versions = proposal.versions || [];
-        proposal.versions.push(req.params.vid);
-        await proposal.save();
-        return res.status(200).json({ message: 'Success' });
-    });
-
     app.use('/auth', AuthRoute);
     app.use('/api/diffs', DiffRoute);
     app.use('/api/pages', PageRoute);

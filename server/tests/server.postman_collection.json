@@ -475,40 +475,6 @@
 					"response": []
 				},
 				{
-					"name": "Add proposal version",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b4fcaf54-6669-4ed1-860a-47e193660504",
-								"exec": [
-									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"url": {
-							"raw": "{{host}}/api/proposals/{{proposal_id}}/add_version/{{diff_id}}",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"proposals",
-								"{{proposal_id}}",
-								"add_version",
-								"{{diff_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Retrieve Proposal",
 					"event": [
 						{
@@ -790,7 +756,7 @@
 								"exec": [
 									"pm.test(\"Status\", () => pm.response.to.have.status(201))",
 									"",
-									"pm.environment.set(\"test_id\", pm.response.json())"
+									"pm.environment.set(\"settings_id\", pm.response.json())"
 								],
 								"type": "text/javascript"
 							}
@@ -824,15 +790,12 @@
 							"script": {
 								"id": "29104cae-d3d0-43b8-bef1-37127bec3597",
 								"exec": [
-									"pm.test(\"Status\", () => pm.response.to.have.status(200))",
-									"",
-									"pm.test(\"Correct body format\", () => pm.response.to.have.jsonSchema({",
-									"    \"type\": \"object\",",
-									"    \"properties\": {",
-									"        \"sections\": { \"type\": \"Object\" },",
-									"    },",
-									"    \"required\": [\"properties\"]",
-									"}))"
+									"pm.test(\"Status\", () => pm.response.to.have.status(200));",
+									"pm.test(\"Valid body\", () => {",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.be.an(\"object\");",
+									"    pm.expect(body.sections).to.be.an(\"object\");",
+									"})"
 								],
 								"type": "text/javascript"
 							}
